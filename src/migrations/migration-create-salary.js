@@ -1,27 +1,24 @@
 'use strict';
 module.exports = {
     up: async (queryInterface, Sequelize) => {
-        await queryInterface.createTable('histories', {
-            // patientId: DataTypes.INTEGER,
-            // doctorId: DataTypes.INTEGER,
-            // description: DataTypes.TEXT,
+        await queryInterface.createTable('salaries', {
             id: {
                 allowNull: false,
                 autoIncrement: true,
                 primaryKey: true,
                 type: Sequelize.INTEGER
             },
-            patientId: {
-                type: Sequelize.INTEGER
+            stylistId: {
+                type: Sequelize.INTEGER,
             },
-            doctorId: {
-                type: Sequelize.INTEGER
+            BaseSalary: {
+                type: Sequelize.STRING,
             },
-            description: {
-                type: Sequelize.TEXT
+            CommissionPercentage: {
+                type: Sequelize.STRING,
             },
-            files: {
-                type: Sequelize.TEXT
+            PaidOn: {
+                type: Sequelize.STRING,
             },
             createdAt: {
                 allowNull: false,
@@ -34,6 +31,6 @@ module.exports = {
         });
     },
     down: async (queryInterface, Sequelize) => {
-        await queryInterface.dropTable('histories');
+        await queryInterface.dropTable('salaries');
     }
 };

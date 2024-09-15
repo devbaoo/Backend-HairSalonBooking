@@ -1,31 +1,33 @@
-'use strict';
+-'use strict';
 module.exports = {
     up: async (queryInterface, Sequelize) => {
-        await queryInterface.createTable('doctor_clinic_specialty', {
-
-            // currentNumber: DataTypes.INTEGER,
-            // maxNumber: DataTypes.INTEGER,
-            // date: DataTypes.DATE,
-            // timeType: DataTypes.STRING,
-            // doctorId: DataTypes.INTEGER,
-
+        await queryInterface.createTable('markdowns', {
             id: {
                 allowNull: false,
                 autoIncrement: true,
                 primaryKey: true,
                 type: Sequelize.INTEGER
             },
-            doctorId: {
+            contentHTML: {
+                allowNull: false,
+                type: Sequelize.TEXT('long')
+            },
+            contentMarkdown: {
+                allowNull: false,
+                type: Sequelize.TEXT('long')
+            },
+            description: {
+                allowNull: true,
+                type: Sequelize.TEXT('long')
+            },
+            stylistId: {
+                allowNull: true,
                 type: Sequelize.INTEGER
             },
-            clinicId: {
+            serviceId: {
+                allowNull: true,
                 type: Sequelize.INTEGER
             },
-            specialtyId: {
-                type: Sequelize.INTEGER
-            },
-
-
             createdAt: {
                 allowNull: false,
                 type: Sequelize.DATE
@@ -37,6 +39,6 @@ module.exports = {
         });
     },
     down: async (queryInterface, Sequelize) => {
-        await queryInterface.dropTable('doctor_clinic_specialty');
+        await queryInterface.dropTable('markdowns');
     }
 };

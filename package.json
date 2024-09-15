@@ -5,11 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --exec babel-node src/server.js"
+    "start": "nodemon --exec ./node_modules/.bin/babel-node src/server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "babel-node": "^0.0.1-security",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
@@ -20,10 +21,10 @@
     "sequelize": "^6.6.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.10",
-    "@babel/node": "^7.12.10",
-    "@babel/preset-env": "^7.12.10",
-    "nodemon": "^2.0.7",
+    "@babel/core": "^7.25.2",
+    "@babel/node": "^7.25.0",
+    "@babel/preset-env": "^7.25.4",
+    "nodemon": "^2.0.22",
     "sequelize-cli": "^6.2.0"
   }
 }
