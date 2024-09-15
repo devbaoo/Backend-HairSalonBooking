@@ -76,7 +76,7 @@ let handleRegister = (data) => {
         });
         resolve({
           errCode: 0,
-          message: "hay ho",
+          message: "OK",
           data: user,
         });
       }
