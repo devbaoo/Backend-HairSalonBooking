@@ -101,8 +101,99 @@ let handleRegister = (data) => {
     }
   });
 };
+let editUser = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // Check for required parameters
+      if (!data.positionId || !data.gender || !data.roleId || !data.id) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing input parameter",
+        });
+        return;
+      }
+
+      // Find user by primary key (id)
+      let user = await db.User.findByPk(data.id, { raw: false });
+
+      if (user) {
+        // Update user properties
+        user.firstName = data.firstName;
+        user.lastName = data.lastName;
+        user.address = data.address;
+        user.gender = data.gender;
+        user.phoneNumber = data.phoneNumber;
+        user.positionId = data.positionId;
+        user.image = data.image;
+
+        // Save the updated user
+        await user.save();
+
+        resolve({
+          errCode: 0,
+          message: "Update user successfully!",
+        });
+      } else {
+        resolve({
+          errCode: 1,
+          errMessage: "User not found",
+        });
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+let deleteUser = (userId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // Tìm người dùng theo ID
+      let user = await db.User.findOne({
+        where: { id: userId },
+      });
+      if (user) {
+        // Xóa người dùng đã tìm thấy
+        await db.User.destroy({
+          where: { id: userId },
+        });
+        resolve({
+          errCode: 0,
+          message: "User deleted successfully",
+        });
+      } else {
+        resolve({
+          errCode: 1,
+          errMessage: "User not found",
+        });
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+let getAllUsers = async (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!data.users) {
+        resolve({
+          errCode: 1,
+          errMessage: "No User",
+        });
+        return;
+      }
+      let users = await db.User.findAll({ raw: true });
+      resolve(users);
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
 
 module.exports = {
   handleUserLogin: handleUserLogin,
   handleRegister: handleRegister,
+  editUser: editUser,
+  deleteUser: deleteUser,
+  getAllUsers: getAllUsers,
 };
