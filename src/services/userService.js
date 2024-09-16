@@ -12,22 +12,38 @@ let handleUserLogin = (email, password) => {
         return;
       }
       let isExist = checkUserEmail(email);
-      if (!isExist) {
+      if (isExist) {
+        let user = await db.User.findOne({
+          attributes: ["email", "roleId", "password"],
+          where: { email: email },
+          raw: true,
+        });
+
+        if (user) {
+          let hashPassword = await bcrypt.compare(password, user.password);
+          if (!hashPassword) {
+            resolve({
+              errCode: 3,
+              errMessage: "Incorrect password",
+            });
+          } else {
+            resolve({
+              errCode: 0,
+              errMessage: "Login successful",
+            });
+          }
+        } else {
+          resolve({
+            errCode: 2,
+            errMessage: "Email not found",
+          });
+        }
+      } else {
         resolve({
           errCode: 2,
-          errMessage: "User's not found",
+          errMessage: "Email not found",
         });
       }
-      let user = await db.User.findOne({
-        attributes: ["email", "roleId", "password"],
-        where: { email: email },
-        raw: true,
-      });
-      resolve({
-        userId: user.id,
-        roleId: user.roleId,
-        password: user.password,
-      });
     } catch (e) {
       reject(e);
     }

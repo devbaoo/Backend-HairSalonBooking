@@ -65,7 +65,9 @@ import userService from "../services/userService";
 
 let handleLogin = async (req, res) => {
   try {
-    let data = await userService.handleUserLogin(req.body);
+    let email = req.body.email;
+    let password = req.body.password;
+    let data = await userService.handleUserLogin(email, password);
     res.status(200).json(data);
   } catch (error) {
     console.error(error);
