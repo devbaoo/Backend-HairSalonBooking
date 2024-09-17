@@ -25,7 +25,9 @@ connectDB();
 
 // default route for testing
 app.get("/", (req, res) => {
-  res.send("Welcome to the Hair Salon Booking API");
+  res.send(
+    "Welcome to the Hair Salon Booking API! Open Postman and test it out!"
+  );
 });
 
 let port = process.env.PORT || 8080;
@@ -33,7 +35,5 @@ let port = process.env.PORT || 8080;
 
 app.listen(port, () => {
   //callback
-  console.log(
-    `Backend Nodejs is runing on the port http://localhost:${port}/api-docs`
-  );
+  console.log(`Backend Nodejs is runing on the port http://localhost:${port}`);
 });

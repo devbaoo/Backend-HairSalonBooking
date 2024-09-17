@@ -66,6 +66,7 @@ let checkUserEmail = (userEmail) => {
     }
   });
 };
+
 let handleRegister = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -101,6 +102,7 @@ let handleRegister = (data) => {
     }
   });
 };
+
 let editUser = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
