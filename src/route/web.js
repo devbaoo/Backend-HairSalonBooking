@@ -1,6 +1,7 @@
 import express from "express";
 import userController from "../controllers/userController";
 import allCodeController from "../controllers/allCodeController";
+import stylistController from '../controllers/stylistController';
 
 let router = express.Router();
 
@@ -18,6 +19,8 @@ let initWebRoutes = (app) => {
   router.get("/api/get-allcode", allCodeController.getAllCodeService);
 
   router.get('/api/get-all-stylist', stylistController.getAllStylists);
+  router.post('/api/save-info-stylists', stylistController.postInfoStylist);
+
 
   return app.use("/", router);
 };
