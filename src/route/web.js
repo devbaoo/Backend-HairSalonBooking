@@ -13,6 +13,8 @@ let initWebRoutes = (app) => {
   router.delete("/api/delete-user", userController.deleteUser); // Tag: User
   router.get("/api/get-all-user", userController.getAllUsers); // Tag: User
 
+  router.get('/api/get-all-stylist', stylistController.getAllStylists);
+
   return app.use("/", router);
 };
 
