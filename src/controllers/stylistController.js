@@ -13,9 +13,21 @@ let getAllStylists = async (req, res) => {
     }
 };
 
+let postInfoStylist = async (req, res) => {
+    try {
+        let response = await stylistService.saveDetailInfoStylist(req.body);
+        return res.status(200).json(response);
+    } catch (e) {
+        return res.status(500).json({
+            errCode: -1,
+            errMsg: 'An error occurred on the server'
+        });
+    }
+};
+
 
 module.exports = {
     getAllStylists: getAllStylists,
-
+    postInfoStylist: postInfoStylist
 
 }
