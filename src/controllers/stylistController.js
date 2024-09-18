@@ -25,9 +25,22 @@ let postInfoStylist = async (req, res) => {
     }
 };
 
+let getDetailStylistById = async (req, res) => {
+    try {
+        let info = await stylistService.getDetailStylistById(req.query.id);
+        return res.status(200).json(info)
+    } catch (e) {
+        return res.status(200).json({
+            errCode: -1,
+            errMsg: 'An error occurred on the server'
+        })
+    }
+};
+
 
 module.exports = {
     getAllStylists: getAllStylists,
-    postInfoStylist: postInfoStylist
+    postInfoStylist: postInfoStylist,
+    getDetailStylistById: getDetailStylistById
 
 }
