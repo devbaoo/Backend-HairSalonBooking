@@ -145,9 +145,85 @@ let getDetailStylistById = (id) => {
     })
 };
 
+let createSchedule = (scheduleData) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!scheduleData.arrSchedule || !scheduleData.arrSchedule.length) {
+                resolve({
+                    errCode: 1,
+                    errMsg: 'Missing required parameter: arrSchedule'
+                });
+                return;
+            }
+
+            // Extract stylistId and date from the first schedule item
+            const stylistId = scheduleData.arrSchedule[0].stylistId;
+            const date = scheduleData.arrSchedule[0].date;
+
+            // Check for missing stylistId or date
+            if (!stylistId) {
+                console.error('stylistId is missing:', scheduleData);
+                resolve({
+                    errCode: 2,
+                    errMsg: 'Missing required parameter: stylistId'
+                });
+                return;
+            }
+            if (!date) {
+                resolve({
+                    errCode: 3,
+                    errMsg: 'Missing required parameter: date'
+                });
+                return;
+            }
+
+            let schedule = scheduleData.arrSchedule.map(time => {
+                time.maxNumber = MAX_NUMBER_SCHEDULE;
+                return time;
+            });
+
+            // Fetch existing schedules for the stylist on the specified date
+            let existing = await db.Schedule.findAll({
+                where: {
+                    stylistId: stylistId,
+                    date: date
+                },
+                attributes: ['timeType', 'date', 'stylistId', 'maxNumber'],
+                raw: true
+            });
+
+            // Adjust existing schedules' dates to ensure proper comparison
+            existing = existing.map(time => {
+                time.date = new Date(time.date).getTime(); // Ensure date is in the same format
+                return time;
+            });
+
+            // Use _.differenceWith to find schedules that need to be created
+            let toCreate = _.differenceWith(schedule, existing, (a, b) => {
+                return a.timeType === b.timeType && a.date === b.date;
+            });
+
+            // If there are new schedules, insert them into the database
+            if (toCreate && toCreate.length > 0) {
+                await db.Schedule.bulkCreate(toCreate);
+            }
+            resolve({
+                errCode: 0,
+                errMsg: 'Schedule created successfully!'
+            });
+        } catch (e) {
+            reject({
+                errCode: -1,
+                errMsg: 'An error occurred while creating the schedule'
+            });
+        }
+    });
+};
+
 
 module.exports = {
     getAllStylists: getAllStylists,
     saveDetailInfoStylist: saveDetailInfoStylist,
-    getDetailStylistById: getDetailStylistById
+    getDetailStylistById: getDetailStylistById,
+    createSchedule: createSchedule
 }

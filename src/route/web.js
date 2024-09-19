@@ -21,6 +21,7 @@ let initWebRoutes = (app) => {
   router.get('/api/get-all-stylist', stylistController.getAllStylists);
   router.post('/api/save-info-stylists', stylistController.postInfoStylist);
   router.get('/api/get-detail-stylist-by-id', stylistController.getDetailStylistById);
+  router.post('/api/create-schedule', stylistController.createSchedule);
 
 
 
