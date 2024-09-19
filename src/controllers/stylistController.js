@@ -37,10 +37,23 @@ let getDetailStylistById = async (req, res) => {
     }
 };
 
+let createSchedule = async (req, res) => {
+    try {
+        let response = await stylistService.createSchedule(req.body);
+        return res.status(200).json(response);
+    } catch (e) {
+        return res.status(200).json({
+            errCode: -1,
+            errMsg: 'An error occurred on the server'
+        })
+    }
+};
+
 
 module.exports = {
     getAllStylists: getAllStylists,
     postInfoStylist: postInfoStylist,
-    getDetailStylistById: getDetailStylistById
+    getDetailStylistById: getDetailStylistById,
+    createSchedule: createSchedule
 
 }
