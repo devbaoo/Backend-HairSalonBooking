@@ -36,9 +36,9 @@ let initWebRoutes = (app) => {
     "/api/get-detail-service-by-id",
     serviceController.getDetailServiceById
   );
-  // router.put("/api/update-service", serviceController.updateService);
-  // router.delete("/api/delete-service", serviceController.deleteService);
-  // router.get("/api/get-all-services", serviceController.getAllServices);
+  router.put("/api/update-service", serviceController.updateService);
+  router.delete("/api/delete-service", serviceController.deleteService);
+  router.get("/api/get-all-services", serviceController.getAllServices);
 
   return app.use("/", router);
 };
