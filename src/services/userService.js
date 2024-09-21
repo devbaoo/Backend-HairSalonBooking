@@ -177,13 +177,6 @@ let deleteUser = (userId) => {
 let getAllUsers = async (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!data.users) {
-        resolve({
-          errCode: 1,
-          errMessage: "No User",
-        });
-        return;
-      }
       let users = await db.User.findAll({ raw: true });
       resolve(users);
     } catch (e) {

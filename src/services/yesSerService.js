@@ -61,4 +61,85 @@ let getDetailServiceById = (id) => {
     }
   });
 };
-module.exports = { createService, getDetailServiceById };
+let updateService = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!data.id) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required fields",
+        });
+      } else {
+        // let service = await db.Service.findByPk(data.id);
+        let service = await db.Service.findByPk(data.id, { raw: false });
+        if (service) {
+          service.name = data.name;
+          service.priceId = data.priceId;
+          service.image = data.image;
+          service.descriptionHTML = data.descriptionHTML;
+          service.descriptionMarkdown = data.descriptionMarkdown;
+
+          await service.save();
+          resolve({
+            errCode: 0,
+            errMessage: "Update service successfully",
+          });
+        } else {
+          resolve({
+            errCode: 1,
+            errMessage: "Service not found",
+          });
+        }
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+let deleteService = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!id) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parameter",
+        });
+      } else {
+        let service = await db.Service.findByPk(id);
+        if (service) {
+          await db.Service.destroy({
+            where: { id: id },
+          });
+          resolve({
+            errCode: 0,
+            errMessage: "Delete service successfully",
+          });
+        } else {
+          resolve({
+            errCode: 1,
+            errMessage: "Service not found",
+          });
+        }
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+let getAllServices = async () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let services = await db.Service.findAll();
+      resolve(services);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+module.exports = {
+  createService,
+  getDetailServiceById,
+  updateService,
+  deleteService,
+  getAllServices,
+};
