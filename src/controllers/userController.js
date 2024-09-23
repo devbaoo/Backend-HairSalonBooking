@@ -50,10 +50,48 @@ let getAllUsers = async (req, res) => {
     });
   }
 };
+let sendEmailforgotPassword = async (req, res) => {
+  try {
+    let data = req.body;
+    let response = await userService.forgotPassword(data);
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Error in sendEmailforgotPassword:", error);
+    res.status(500).json({
+      errCode: 1,
+      message: "Internal Server Error",
+    });
+  }
+};
+const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+  console.log("resetPasswordToken in controller:", token);
+
+  // Validate input
+  if (!token) {
+    return res.status(400).json({
+      errCode: 1,
+      errMessage: "Invalid resetPasswordToken",
+    });
+  }
+
+  try {
+    const result = await userService.resetPassword(token, newPassword);
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(500).json({
+      errCode: 1,
+      errMessage: error.message,
+    });
+  }
+};
 module.exports = {
   handleLogin: handleLogin,
   handleRegister: handleRegister,
   editUser: editUser,
   deleteUser: deleteUser,
   getAllUsers: getAllUsers,
+  sendEmailforgotPassword: sendEmailforgotPassword,
+  resetPassword: resetPassword,
 };
