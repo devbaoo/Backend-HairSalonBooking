@@ -10,6 +10,8 @@ let initWebRoutes = (app) => {
   // Authentication API
   router.post("/api/login", userController.handleLogin);
   router.post("/api/register", userController.handleRegister);
+  router.post("/api/forgot-password", userController.sendEmailforgotPassword);
+  router.put("/api/reset-password/:token", userController.resetPassword);
 
   // User API
   router.put("/api/edit-user", userController.editUser);

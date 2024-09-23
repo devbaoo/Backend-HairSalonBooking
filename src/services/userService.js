@@ -1,5 +1,9 @@
 import db from "../models/index";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
+import emailService from "./emailService";
+
+require("dotenv").config();
 
 let handleUserLogin = (email, password) => {
   return new Promise(async (resolve, reject) => {
@@ -90,6 +94,8 @@ let handleRegister = (data) => {
           phoneNumber: data.phoneNumber,
           positionId: data.positionId,
           image: data.image,
+          resetPasswordToken: data.resetPasswordToken,
+          resetPasswordExpires: data.resetPasswordExpires,
         });
         resolve({
           errCode: 0,
@@ -184,6 +190,102 @@ let getAllUsers = async (data) => {
     }
   });
 };
+const forgotPassword = async (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!data.email) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing email parameter",
+        });
+        return;
+      }
+
+      let user = await db.User.findOne({
+        where: { email: data.email },
+      });
+
+      if (!user) {
+        resolve({
+          errCode: 2,
+          errMessage: "User with this email does not exist.",
+        });
+        return;
+      }
+
+      let token = crypto.randomBytes(20).toString("hex");
+      user.resetPasswordToken = token;
+      user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+      // Ensure the token and expiration are saved to the user record
+      await db.User.update(
+        {
+          resetPasswordToken: token,
+          resetPasswordExpires: Date.now() + 3600000,
+        },
+        {
+          where: { email: data.email },
+        }
+      );
+
+      await emailService.sendForgotPasswordEmail(
+        user.email,
+        user.firstname,
+        token
+      );
+
+      resolve({
+        errCode: 0,
+        message: `An email has been sent to ${user.email} with further instructions.`,
+      });
+    } catch (e) {
+      console.error("Error in forgotPassword:", e);
+      reject(e);
+    }
+  });
+};
+
+const { User } = require("../models"); // Adjust the path as necessary
+
+const resetPassword = async (resetPasswordToken, newPassword) => {
+  // Debug logging
+  console.log("resetPasswordToken:", resetPasswordToken);
+
+  // Validate input
+  if (!resetPasswordToken) {
+    throw new Error("Invalid resetPasswordToken");
+  }
+
+  try {
+    // Assuming you are using a database ORM like Sequelize
+    const user = await User.findOne({
+      where: { resetPasswordToken },
+    });
+
+    // Debug logging
+    console.log("User found:", user);
+
+    if (!user) {
+      throw new Error("Invalid or expired reset password token");
+    }
+
+    // Update the user's password and clear the reset token
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await User.update(
+      { password: hashedPassword, resetPasswordToken: null },
+      { where: { id: user.id } }
+    );
+
+    return {
+      errCode: 0,
+      message: "Password has been reset successfully.",
+    };
+  } catch (error) {
+    console.error("Error in resetPassword:", error);
+    throw error;
+  }
+};
 
 module.exports = {
   handleUserLogin: handleUserLogin,
@@ -191,4 +293,6 @@ module.exports = {
   editUser: editUser,
   deleteUser: deleteUser,
   getAllUsers: getAllUsers,
+  forgotPassword: forgotPassword,
+  resetPassword: resetPassword,
 };
