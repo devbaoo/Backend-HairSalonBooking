@@ -49,11 +49,23 @@ let createSchedule = async (req, res) => {
     }
 };
 
+let getScheduleByDate = async (req, res) => {
+    try {
+        let response = await stylistService.getScheduleByDate(req.query.stylistId, req.query.date);
+        return res.status(200).json(response);
+    } catch (e) {
+        return res.status(200).json({
+            errCode: -1,
+            errMsg: 'An error occurred on the server'
+        })
+    }
+}
 
 module.exports = {
     getAllStylists: getAllStylists,
     postInfoStylist: postInfoStylist,
     getDetailStylistById: getDetailStylistById,
-    createSchedule: createSchedule
+    createSchedule: createSchedule,
+    getScheduleByDate: getScheduleByDate
 
 }

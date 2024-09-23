@@ -18,10 +18,12 @@ let initWebRoutes = (app) => {
   //AllCode API
   router.get("/api/get-allcode", allCodeController.getAllCodeService);
 
+  //Stylist API
   router.get('/api/get-all-stylist', stylistController.getAllStylists);
   router.post('/api/save-info-stylists', stylistController.postInfoStylist);
   router.get('/api/get-detail-stylist-by-id', stylistController.getDetailStylistById);
   router.post('/api/create-schedule', stylistController.createSchedule);
+  router.get('/api/get-schedule-stylist-by-date', stylistController.getScheduleByDate);
 
 
 
