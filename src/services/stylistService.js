@@ -3,6 +3,7 @@ import db from '../models/index';
 import { where } from 'sequelize';
 import _, { includes } from 'lodash';
 import { raw } from 'body-parser';
+const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
 
 
 let getAllStylists = () => {
@@ -220,10 +221,45 @@ let createSchedule = (scheduleData) => {
     });
 };
 
+let getScheduleByDate = (stylistId, date) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!stylistId || !date) {
+                resolve({
+                    errCode: 1,
+                    errMsg: 'Missing required parameter'
+                })
+                return;
+            } else {
+                let dataSchedule = await db.Schedule.findAll({
+                    where: {
+                        stylistId: stylistId,
+                        date: date
+                    },
+                    include: [// lay cai chung
+                        { model: db.Allcode, as: 'timeTypeData', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.User, as: 'stylistData', attributes: ['firstName', 'lastName'] },
+                    ],
+                    raw: false,
+                    nest: true
+                })
+                if (!dataSchedule) dataSchedule = [];
+                resolve({
+                    errCode: 0,
+                    data: dataSchedule
+                })
+            }
+        } catch (e) {
+            reject(e);
+        }
+    })
+};
+
 
 module.exports = {
     getAllStylists: getAllStylists,
     saveDetailInfoStylist: saveDetailInfoStylist,
     getDetailStylistById: getDetailStylistById,
-    createSchedule: createSchedule
+    createSchedule: createSchedule,
+    getScheduleByDate: getScheduleByDate
 }
