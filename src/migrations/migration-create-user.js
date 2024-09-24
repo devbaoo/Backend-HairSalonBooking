@@ -38,11 +38,14 @@ module.exports = {
       image: {
         type: Sequelize.STRING,
       },
+      refreshToken: {
+        type: Sequelize.STRING,
+      },
       resetPasswordToken: {
         type: Sequelize.STRING,
       },
       resetPasswordExpires: {
-        type: Sequelize.STRING,
+        type: Sequelize.DATE,
       },
       createdAt: {
         allowNull: false,
