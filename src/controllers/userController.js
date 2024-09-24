@@ -1,4 +1,5 @@
 import userService from "../services/userService";
+const { generateAccessToken, generateRefreshToken } = require("../utils/token");
 
 let handleLogin = async (req, res) => {
   try {
@@ -86,6 +87,7 @@ const resetPassword = async (req, res) => {
     });
   }
 };
+
 module.exports = {
   handleLogin: handleLogin,
   handleRegister: handleRegister,

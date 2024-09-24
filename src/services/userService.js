@@ -2,6 +2,10 @@ import db from "../models/index";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import emailService from "./emailService";
+const { generateAccessToken, generateRefreshToken } = require("../utils/token");
+const jwt = require("jsonwebtoken");
+const { promisify } = require("util");
+const verifyToken = promisify(jwt.verify);
 
 require("dotenv").config();
 
@@ -15,25 +19,47 @@ let handleUserLogin = (email, password) => {
         });
         return;
       }
-      let isExist = checkUserEmail(email);
+
+      let isExist = await checkUserEmail(email);
       if (isExist) {
         let user = await db.User.findOne({
-          attributes: ["email", "roleId", "password"],
+          attributes: [
+            "id",
+            "email",
+            "roleId",
+            "password",
+            "lastName",
+            "firstName",
+          ],
           where: { email: email },
           raw: true,
         });
 
         if (user) {
-          let hashPassword = await bcrypt.compare(password, user.password);
-          if (!hashPassword) {
+          let isPasswordValid = await bcrypt.compare(password, user.password); // Check password
+          if (!isPasswordValid) {
             resolve({
               errCode: 3,
               errMessage: "Incorrect password",
             });
           } else {
+            const userInfo = { id: user.id };
+            const accessToken = generateAccessToken(userInfo);
+            const refreshToken = generateRefreshToken(userInfo);
+
+            // Save refresh token in the database
+            await db.User.update({ refreshToken }, { where: { id: user.id } });
+
             resolve({
               errCode: 0,
               errMessage: "Login successful",
+              id: user.id,
+              email: user.email,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              roleId: user.roleId,
+              accessToken,
+              refreshToken,
             });
           }
         } else {
@@ -90,10 +116,11 @@ let handleRegister = (data) => {
           lastName: data.lastName,
           address: data.address,
           gender: data.gender,
-          roleId: data.roleId,
+          roleId: data.roleId || "R4",
           phoneNumber: data.phoneNumber,
           positionId: data.positionId,
           image: data.image,
+          refreshToken: data.refreshToken,
           resetPasswordToken: data.resetPasswordToken,
           resetPasswordExpires: data.resetPasswordExpires,
         });
@@ -215,7 +242,7 @@ const forgotPassword = async (data) => {
 
       let token = crypto.randomBytes(20).toString("hex");
       user.resetPasswordToken = token;
-      user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+      user.resetPasswordExpires = Date.now() + 3600000; // 1h
 
       // Ensure the token and expiration are saved to the user record
       await db.User.update(
@@ -245,7 +272,7 @@ const forgotPassword = async (data) => {
   });
 };
 
-const { User } = require("../models"); // Adjust the path as necessary
+const { User } = require("../models");
 
 const resetPassword = async (resetPasswordToken, newPassword) => {
   // Debug logging
@@ -257,14 +284,9 @@ const resetPassword = async (resetPasswordToken, newPassword) => {
   }
 
   try {
-    // Assuming you are using a database ORM like Sequelize
     const user = await User.findOne({
       where: { resetPasswordToken },
     });
-
-    // Debug logging
-    console.log("User found:", user);
-
     if (!user) {
       throw new Error("Invalid or expired reset password token");
     }
@@ -273,7 +295,11 @@ const resetPassword = async (resetPasswordToken, newPassword) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     await User.update(
-      { password: hashedPassword, resetPasswordToken: null },
+      {
+        password: hashedPassword,
+        resetPasswordToken: null,
+        resetPasswordExpires: null,
+      },
       { where: { id: user.id } }
     );
 

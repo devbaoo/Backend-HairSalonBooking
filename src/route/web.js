@@ -21,14 +21,17 @@ let initWebRoutes = (app) => {
   //AllCode API
   router.get("/api/get-allcode", allCodeController.getAllCodeService);
 
-
   //Stylist API
-  router.get('/api/get-all-stylist', stylistController.getAllStylists);
-  router.post('/api/save-info-stylists', stylistController.postInfoStylist);
-  router.get('/api/get-detail-stylist-by-id', stylistController.getDetailStylistById);
-  router.get('/api/get-schedule-stylist-by-date', stylistController.getScheduleByDate);
-
-
+  router.get("/api/get-all-stylist", stylistController.getAllStylists);
+  router.post("/api/save-info-stylists", stylistController.postInfoStylist);
+  router.get(
+    "/api/get-detail-stylist-by-id",
+    stylistController.getDetailStylistById
+  );
+  router.get(
+    "/api/get-schedule-stylist-by-date",
+    stylistController.getScheduleByDate
+  );
 
   //Schedule API
   router.post("/api/create-schedule", stylistController.createSchedule);
@@ -42,7 +45,6 @@ let initWebRoutes = (app) => {
   router.put("/api/update-service", serviceController.updateService);
   router.delete("/api/delete-service", serviceController.deleteService);
   router.get("/api/get-all-services", serviceController.getAllServices);
-
 
   return app.use("/", router);
 };

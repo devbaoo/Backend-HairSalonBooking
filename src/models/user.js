@@ -18,6 +18,11 @@ module.exports = (sequelize, DataTypes) => {
         targetKey: "keyMap",
         as: "genderData",
       });
+      User.belongsTo(models.Allcode, {
+        foreignKey: "roleid",
+        targetKey: "keyMap",
+        as: "roleData",
+      });
       User.hasOne(models.Markdown, { foreignKey: "stylistId" });
       User.hasOne(models.Stylist_Info, { foreignKey: "stylistId" });
       User.hasMany(models.Schedule, {
@@ -36,6 +41,7 @@ module.exports = (sequelize, DataTypes) => {
       phoneNumber: DataTypes.STRING,
       gender: DataTypes.STRING,
       image: DataTypes.STRING,
+      refreshToken: DataTypes.STRING,
       roleId: DataTypes.STRING,
       positionId: DataTypes.STRING,
       resetPasswordToken: DataTypes.STRING,
