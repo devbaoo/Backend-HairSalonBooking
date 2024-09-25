@@ -3,8 +3,8 @@ require('dotenv').config();
 import emailService from './emailService';
 import { v4 as uuidv4 } from 'uuid';
 
-let buildUrlEmail = (stylistId, token) => {
-    let result = `${process.env.URL_REACT}/verify-booking?token=${token}&stylistId=${stylistId}`
+let buildUrlEmail = (token) => {
+    let result = `${process.env.URL_REACT}/verify-booking?token=${token}`
     return result;
 };
 
@@ -12,7 +12,7 @@ let createBookAppointment = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
             if (!data.email || !data.stylistId || !data.timeType || !data.date
-                || !data.fullName
+                || !data.fullName || !data.selectedGender || !data.address
 
             ) {
                 resolve({
@@ -23,20 +23,22 @@ let createBookAppointment = (data) => {
             } else {
                 let token = uuidv4();
 
-                await emailService.sendSimpleEmail({
-                    reciverEmail: data.email,
+                await emailService.sendEmailInfoBooking({
+                    receiverEmail: data.email,
                     customerName: data.fullName,
                     time: data.timeString,
                     stylistName: data.stylistName,
-                    language: data.language,
-                    redirectLink: buildUrlEmail(data.stylistId, token)
+                    redirectLink: buildUrlEmail(token)
                 });
 
                 let user = await db.User.findOrCreate({
                     where: { email: data.email },
                     defaults: {
                         email: data.email,
-                        roleId: 'R4'
+                        roleId: 'R4',
+                        firstName: data.fullName,
+                        address: data.address,
+                        gender: data.selectedGender,
                     },
                 });
 

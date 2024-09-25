@@ -50,6 +50,46 @@ let getBodyHTMLEmail = (dataSend) => {
   `;
 };
 
+
+let sendEmailInfoBooking = async (dataSend) => {
+  let transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // Use `true` for port 465, `false` for all other ports
+    auth: {
+      user: process.env.EMAIL_APP,
+      pass: process.env.EMAIL_APP_PASSWORD,
+    },
+  });
+
+  // async..await is not allowed in global scope, must use a wrapper
+
+  // send mail with defined transport object
+  let info = await transporter.sendMail({
+    from: '"HairCare" <HairCare@company.com>', // sender address
+    to: dataSend.receiverEmail, // list of receivers
+    subject: "Confirm Haircut Appointment At Barber Shop", // Subject line
+    html: getBodyHTMLEmailInfoBooking(dataSend),
+  });
+};
+
+let getBodyHTMLEmailInfoBooking = (dataSend) => {
+  `
+      <h3>Xin chào ${dataSend.customerName}!</h3>
+      <p>We are happy to inform you that you have successfully booked an appointment at the Barber Shop. Here are the details of your appointment:</p>
+      <div><b>Time: ${dataSend.time}</b></div>
+      <div><b>Hairdresser: ${dataSend.stylistName}</b></div>
+      <p>Please arrive 5-10 minutes before your appointment time so we can serve you best. If there are any changes to your appointment schedule, please reply to this email for support.</p>
+      <p>If the information is correct, please click the link below to confirm and complete the appointment booking process.</p>
+      <div>
+         <a href=${dataSend.redirectLink} target="_blank">Click here</a> 
+      </div>
+
+      <div>Thank you for choosing Barber Shop, we look forward to serving you.</div>
+      `
+}
+
 module.exports = {
   sendForgotPasswordEmail,
+  sendEmailInfoBooking
 };
