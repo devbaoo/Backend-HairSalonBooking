@@ -1,3 +1,6 @@
+require('dotenv').config();
+
+
 const jwt = require("jsonwebtoken");
 
 const generateAccessToken = (user) => {

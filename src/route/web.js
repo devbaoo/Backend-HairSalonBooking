@@ -3,6 +3,7 @@ import userController from "../controllers/userController";
 import allCodeController from "../controllers/allCodeController";
 import stylistController from "../controllers/stylistController";
 import serviceController from "../controllers/serviceController";
+import customerController from "../controllers/customerController";
 
 let router = express.Router();
 
@@ -24,27 +25,22 @@ let initWebRoutes = (app) => {
   //Stylist API
   router.get("/api/get-all-stylist", stylistController.getAllStylists);
   router.post("/api/save-info-stylists", stylistController.postInfoStylist);
-  router.get(
-    "/api/get-detail-stylist-by-id",
-    stylistController.getDetailStylistById
-  );
-  router.get(
-    "/api/get-schedule-stylist-by-date",
-    stylistController.getScheduleByDate
-  );
+  router.get("/api/get-detail-stylist-by-id", stylistController.getDetailStylistById);
+  router.get("/api/get-schedule-stylist-by-date", stylistController.getScheduleByDate);
 
   //Schedule API
   router.post("/api/create-schedule", stylistController.createSchedule);
 
   //Service API
   router.post("/api/create-service", serviceController.createService);
-  router.get(
-    "/api/get-detail-service-by-id",
-    serviceController.getDetailServiceById
-  );
+  router.get("/api/get-detail-service-by-id", serviceController.getDetailServiceById);
   router.put("/api/update-service", serviceController.updateService);
   router.delete("/api/delete-service", serviceController.deleteService);
   router.get("/api/get-all-services", serviceController.getAllServices);
+
+  //Customer API
+  router.post('/api/customer-book-appointment', customerController.createBookAppointment);
+
 
   return app.use("/", router);
 };
