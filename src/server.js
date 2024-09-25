@@ -9,11 +9,9 @@ require("dotenv").config();
 
 let app = express();
 
-// app.use(cors()); co the config nhu nay cung duoc
-// nhung van recommend cai nay
+// Configure CORS
 app.use(
   cors({
-    origin: process.env.URL_REACT,
     methods: "GET, POST, OPTIONS, PUT, PATCH, DELETE",
     allowedHeaders: "X-Requested-With,content-type",
     credentials: true,
