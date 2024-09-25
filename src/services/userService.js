@@ -41,6 +41,7 @@ let handleUserLogin = (email, password) => {
             resolve({
               errCode: 3,
               errMessage: "Incorrect password",
+              success: false,
             });
           } else {
             const userInfo = { id: user.id };
@@ -53,6 +54,7 @@ let handleUserLogin = (email, password) => {
             resolve({
               errCode: 0,
               errMessage: "Login successful",
+              success: true,
               id: user.id,
               email: user.email,
               firstName: user.firstName,
@@ -66,12 +68,14 @@ let handleUserLogin = (email, password) => {
           resolve({
             errCode: 2,
             errMessage: "Email not found",
+            success: false,
           });
         }
       } else {
         resolve({
           errCode: 2,
           errMessage: "Email not found",
+          success: false,
         });
       }
     } catch (e) {
