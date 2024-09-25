@@ -56,3 +56,8 @@ jobs:
           slot-name: "Production"
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_939EB609B22F4A7098246EE5A31B436F }}
+
+      - name: Verify deployment
+        run: |
+          sleep 60 # Wait for the app to start
+          curl -I https://hairsalonbe.azurewebsites.net
