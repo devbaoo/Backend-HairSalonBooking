@@ -29,8 +29,9 @@ let createBookAppointment = (data) => {
                     time: data.timeString,
                     stylistName: data.stylistName,
                     redirectLink: buildUrlEmail(token)
+                }).catch(err => {
+                    console.log("Error in sending email: ", err);
                 });
-
                 let user = await db.User.findOrCreate({
                     where: { email: data.email },
                     defaults: {
@@ -40,21 +41,21 @@ let createBookAppointment = (data) => {
                         address: data.address,
                         gender: data.selectedGender,
                     },
+                }).catch(err => {
+                    console.log("Error in creating user: ", err);
                 });
-
                 //create booking
                 if (user && user[0]) {
-                    await db.Booking.findOrCreate({
-                        where: { customerId: user[0].id },
-                        defaults: {
-                            statusId: 'S1',
-                            stylistId: data.stylistId,
-                            customerId: user[0].id,
-                            date: data.date,
-                            timeType: data.timeType,
-                            token: token
-                        },
-                    })
+                    await db.Booking.create({
+                        statusId: 'S1',
+                        stylistId: data.stylistId,
+                        customerId: user[0].id,
+                        date: data.date,
+                        timeType: data.timeType,
+                        token: token
+                    }).catch(err => {
+                        console.log("Error in creating booking: ", err);
+                    });
                 }
                 resolve({
                     errCode: 0,
