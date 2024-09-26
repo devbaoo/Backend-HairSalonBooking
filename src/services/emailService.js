@@ -74,7 +74,7 @@ let sendEmailInfoBooking = async (dataSend) => {
 };
 
 let getBodyHTMLEmailInfoBooking = (dataSend) => {
-  `
+  return `
       <h3>Xin chào ${dataSend.customerName}!</h3>
       <p>We are happy to inform you that you have successfully booked an appointment at the Barber Shop. Here are the details of your appointment:</p>
       <div><b>Time: ${dataSend.time}</b></div>
@@ -82,12 +82,13 @@ let getBodyHTMLEmailInfoBooking = (dataSend) => {
       <p>Please arrive 5-10 minutes before your appointment time so we can serve you best. If there are any changes to your appointment schedule, please reply to this email for support.</p>
       <p>If the information is correct, please click the link below to confirm and complete the appointment booking process.</p>
       <div>
-         <a href=${dataSend.redirectLink} target="_blank">Click here</a> 
+         <a href="${dataSend.redirectLink}" target="_blank">Click here</a> 
       </div>
 
       <div>Thank you for choosing Barber Shop, we look forward to serving you.</div>
-      `
-}
+  `;
+};
+
 
 module.exports = {
   sendForgotPasswordEmail,
