@@ -4,7 +4,7 @@ import emailService from './emailService';
 import { v4 as uuidv4 } from 'uuid';
 
 let buildUrlEmail = (token) => {
-    let result = `${process.env.URL_REACT}/verify-booking?token=${token}`
+    let result = `${process.env.URL_REACT}/verify-booking?token=${token}&stylistId=${stylistId}`
     return result;
 };
 let createBookAppointment = (data) => {
@@ -73,7 +73,7 @@ let createBookAppointment = (data) => {
                     customerName: data.fullName,
                     time: data.timeString,
                     stylistName: data.stylistName,
-                    redirectLink: buildUrlEmail(token)
+                    redirectLink: buildUrlEmail(data.stylistId, token)
                 }).catch(err => {
                     console.log("Error in sending email: ", err);
                 });
@@ -91,9 +91,47 @@ let createBookAppointment = (data) => {
 };
 
 
+let postVerifyBookAppointment = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data.token || !data.stylistId) {
+                resolve({
+                    errCode: 1,
+                    errMsg: 'Missing required parameter'
+                });
+                return;
+            } else {
+                let appointment = await db.Booking.findOne({
+                    where: {
+                        stylistId: data.stylistId,
+                        token: data.token,
+                        statusId: 'S1'
+                    },
+                    raw: false // raw: false so we can use the save method of sequelize
+                });
 
-
+                if (appointment) {
+                    appointment.statusId = 'S2';
+                    await appointment.save(); // Corrected from 'booking.save'
+                    resolve({
+                        errCode: 0,
+                        errMsg: 'Customer verified booking appointment successfully'
+                    });
+                } else {
+                    resolve({
+                        errCode: 2,
+                        errMsg: 'Appointment has been activated or does not exist'
+                    });
+                }
+            }
+        } catch (e) {
+            console.error('Error in postVerifyBookAppointment service:', e);
+            reject(e);
+        }
+    });
+};
 
 module.exports = {
-    createBookAppointment: createBookAppointment
+    createBookAppointment: createBookAppointment,
+    postVerifyBookAppointment: postVerifyBookAppointment,
 }
