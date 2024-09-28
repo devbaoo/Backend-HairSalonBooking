@@ -50,7 +50,6 @@ let getBodyHTMLEmail = (dataSend) => {
   `;
 };
 
-
 let sendEmailInfoBooking = async (dataSend) => {
   let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -89,8 +88,7 @@ let getBodyHTMLEmailInfoBooking = (dataSend) => {
   `;
 };
 
-
 module.exports = {
   sendForgotPasswordEmail,
-  sendEmailInfoBooking
+  sendEmailInfoBooking,
 };
