@@ -87,6 +87,18 @@ const resetPassword = async (req, res) => {
     });
   }
 };
+let getUserById = async (req, res) => {
+  try {
+    let id = req.query.id;
+    let data = await userService.getUserById(id);
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({
+      errCode: 1,
+      message: "Internal Server Error",
+    });
+  }
+};
 
 module.exports = {
   handleLogin: handleLogin,
@@ -96,4 +108,5 @@ module.exports = {
   getAllUsers: getAllUsers,
   sendEmailforgotPassword: sendEmailforgotPassword,
   resetPassword: resetPassword,
+  getUserById: getUserById,
 };
