@@ -109,6 +109,7 @@ let handleRegister = (data) => {
         resolve({
           errCode: 2,
           errMessage: "Email already exists",
+          success: false,
         });
         return;
       } else {
@@ -131,6 +132,7 @@ let handleRegister = (data) => {
         resolve({
           errCode: 0,
           message: "OK",
+          success: true,
           data: user,
         });
       }
@@ -316,7 +318,29 @@ const resetPassword = async (resetPasswordToken, newPassword) => {
     throw error;
   }
 };
-
+let getUserById = async (userId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (userId === null || userId === undefined) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parameter",
+        });
+        return;
+      }
+      let user = await db.User.findOne({
+        where: { id: userId },
+      });
+      if (user) {
+        resolve(user);
+      } else {
+        resolve(null);
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
 module.exports = {
   handleUserLogin: handleUserLogin,
   handleRegister: handleRegister,
@@ -325,4 +349,5 @@ module.exports = {
   getAllUsers: getAllUsers,
   forgotPassword: forgotPassword,
   resetPassword: resetPassword,
+  getUserById: getUserById,
 };
