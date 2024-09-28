@@ -263,7 +263,7 @@ const forgotPassword = async (data) => {
 
       await emailService.sendForgotPasswordEmail(
         user.email,
-        user.firstname,
+        user.firstName,
         token
       );
 
