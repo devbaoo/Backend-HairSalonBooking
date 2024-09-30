@@ -74,7 +74,7 @@ let sendEmailInfoBooking = async (dataSend) => {
 
 let getBodyHTMLEmailInfoBooking = (dataSend) => {
   return `
-      <h3>Xin chào ${dataSend.customerName}!</h3>
+      <h3>Hello ${dataSend.customerName}!</h3>
       <p>We are happy to inform you that you have successfully booked an appointment at the Barber Shop. Here are the details of your appointment:</p>
       <div><b>Time: ${dataSend.time}</b></div>
       <div><b>Hairdresser: ${dataSend.stylistName}</b></div>

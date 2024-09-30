@@ -255,11 +255,58 @@ let getScheduleByDate = (stylistId, date) => {
     })
 };
 
+let getListCustomerForDoctor = (stylistId, date) => {
+
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!stylistId || !date) {
+                resolve({
+                    errCode: 1,
+                    errMsg: 'Missing required parameter'
+                })
+                return;
+            } else {
+                let data = await db.Booking.findAll({
+                    where: {
+                        statusId: 'S2',
+                        stylistId: stylistId,
+                        date: date
+                    },
+                    include: [
+                        {
+                            model: db.User, as: 'customerData',
+                            attributes: ['email', 'firstName', 'address', 'gender'],
+                            include: [
+                                {
+                                    model: db.Allcode, as: 'genderData', attributes: ['valueEn', 'valueVi']
+                                },
+                            ]
+                        },
+                        {
+                            model: db.Allcode, as: 'timeTypeDataBooking',
+                            attributes: ['valueEn', 'valueVi']
+                        }
+                    ],
+                    raw: false,
+                    nest: true
+                })
+                resolve({
+                    errCode: 0,
+                    data: data
+                })
+            }
+        } catch (e) {
+            reject(e)
+        }
+    })
+};
+
 
 module.exports = {
     getAllStylists: getAllStylists,
     saveDetailInfoStylist: saveDetailInfoStylist,
     getDetailStylistById: getDetailStylistById,
     createSchedule: createSchedule,
-    getScheduleByDate: getScheduleByDate
+    getScheduleByDate: getScheduleByDate,
+    getListCustomerForDoctor: getListCustomerForDoctor
 }

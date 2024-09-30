@@ -59,13 +59,28 @@ let getScheduleByDate = async (req, res) => {
             errMsg: 'An error occurred on the server'
         })
     }
-}
+};
+
+let getListCustomerForDoctor = async (req, res) => {
+    try {
+        let response = await stylistService.getListCustomerForDoctor(req.query.stylistId, req.query.date);
+        return res.status(200).json(response);
+    } catch (e) {
+        console.log(e);
+
+        return res.status(200).json({
+            errCode: -1,
+            errMsg: 'An error occurred on the server'
+        })
+    }
+};
 
 module.exports = {
     getAllStylists: getAllStylists,
     postInfoStylist: postInfoStylist,
     getDetailStylistById: getDetailStylistById,
     createSchedule: createSchedule,
-    getScheduleByDate: getScheduleByDate
+    getScheduleByDate: getScheduleByDate,
+    getListCustomerForDoctor: getListCustomerForDoctor
 
 }
