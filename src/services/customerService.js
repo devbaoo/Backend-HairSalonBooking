@@ -4,7 +4,7 @@ import emailService from "./emailService";
 import { v4 as uuidv4 } from "uuid";
 
 let buildUrlEmail = (token) => {
-  let result = `${process.env.URL_REACT}/verify-booking?token=${token}&stylistId=${stylistId}`;
+  let result = `${process.env.URL_REACT}/verify-booking?token=${token}`;
   return result;
 };
 let createBookAppointment = (data) => {
@@ -80,7 +80,7 @@ let createBookAppointment = (data) => {
             customerName: data.fullName,
             time: data.timeString,
             stylistName: data.stylistName,
-            redirectLink: buildUrlEmail(data.stylistId, token),
+            redirectLink: buildUrlEmail(token),
           })
           .catch((err) => {
             console.log("Error in sending email: ", err);
