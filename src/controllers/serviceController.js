@@ -51,9 +51,11 @@ let getAllServices = async (req, res) => {
     let response = await yesSerService.getAllServices(req.body);
     return res.status(200).json(response);
   } catch (e) {
-    return res.status(200).json({
+    console.log("Error: ", e);
+    return res.status(500).json({
       errCode: -1,
       errMsg: "An error occurred on the server",
+      details: e.message,
     });
   }
 };
