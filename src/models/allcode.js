@@ -13,6 +13,8 @@ module.exports = (sequelize, DataTypes) => {
       Allcode.hasMany(models.User, { foreignKey: 'positionId', as: 'positionData' })
       Allcode.hasMany(models.User, { foreignKey: 'gender', as: 'genderData' })
       Allcode.hasMany(models.Schedule, { foreignKey: 'timeType', as: 'timeTypeData' })
+      Allcode.hasMany(models.Booking, { foreignKey: 'timeType', as: 'timeTypeDataBooking' })
+
 
       // Allcode.hasMany(models.Stylist_Info, { foreignKey: 'priceId', as: 'priceTypeData' })
       // Allcode.hasMany(models.Stylist_Info, { foreignKey: 'provinceId', as: 'provinceTypeData' })
@@ -28,6 +30,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Allcode',
+    tableName: 'allcodes' // Set explicit table name in lowercase
+
   });
   return Allcode;
 };

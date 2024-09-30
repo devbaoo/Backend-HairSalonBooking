@@ -34,6 +34,8 @@ let initWebRoutes = (app) => {
     "/api/get-schedule-stylist-by-date",
     stylistController.getScheduleByDate
   );
+  router.get('/api/get-list-customer-booking-for-stylist', stylistController.getListCustomerForDoctor);
+
 
   //Schedule API
   router.post("/api/create-schedule", stylistController.createSchedule);
