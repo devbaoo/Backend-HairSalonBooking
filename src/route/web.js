@@ -4,6 +4,7 @@ import allCodeController from "../controllers/allCodeController";
 import stylistController from "../controllers/stylistController";
 import serviceController from "../controllers/serviceController";
 import customerController from "../controllers/customerController";
+import feedbackController from "../controllers/feedbackController";
 
 let router = express.Router();
 
@@ -59,6 +60,9 @@ let initWebRoutes = (app) => {
     "/api/verify-book-appointment",
     customerController.postVerifyBookAppointment
   );
+
+  //Feedback API
+  router.post("/api/create-feedback", feedbackController.createFeedback);
 
   return app.use("/", router);
 };
