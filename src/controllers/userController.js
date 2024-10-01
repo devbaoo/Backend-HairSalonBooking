@@ -25,12 +25,17 @@ let handleRegister = async (req, res) => {
 };
 let editUser = async (req, res) => {
   try {
-    let data = await userService.editUser(req.body);
-    res.status(200).json(data);
+    let data = {
+      ...req.body, // Combine body fields
+      imageFile: req.file, // Add image file from multer
+    };
+    let result = await userService.editUser(data);
+    res.status(200).json(result);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
+
 let deleteUser = async (req, res) => {
   try {
     let id = req.body.id;
