@@ -5,6 +5,7 @@ import initWebRoutes from "./route/web";
 import connectDB from "./config/connectDB";
 // import cors from "cors";
 
+
 require("dotenv").config();
 
 let app = express();

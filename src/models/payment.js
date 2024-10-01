@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             // define association here
+            Payment.belongsTo(models.Booking, { foreignKey: "bookingId", as: "booking", });
         }
     };
     Payment.init({
@@ -21,6 +22,8 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         sequelize,
         modelName: 'Payment',
+        tableName: "Payment",
+        freezeTableName: true,
     });
     return Payment;
 };

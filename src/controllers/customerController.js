@@ -6,6 +6,7 @@ let createBookAppointment = async (req, res) => {
         let response = await customerService.createBookAppointment(req.body);
         return res.status(200).json(response);
     } catch (e) {
+        console.log(e);
         return res.status(200).json({
             errCode: -1,
             errMsg: 'An error occurred on the server'
@@ -13,9 +14,9 @@ let createBookAppointment = async (req, res) => {
     }
 };
 
-let postVerifyBookAppointment = async (req, res) => {
+let paymentAndVerifyBookAppointment = async (req, res) => {
     try {
-        let response = await customerService.postVerifyBookAppointment(req.body);
+        let response = await customerService.paymentAndVerifyBookAppointment(req.body);
         return res.status(200).json(response);
     } catch (e) {
         return res.status(200).json({
@@ -27,5 +28,5 @@ let postVerifyBookAppointment = async (req, res) => {
 
 module.exports = {
     createBookAppointment: createBookAppointment,
-    postVerifyBookAppointment: postVerifyBookAppointment,
+    paymentAndVerifyBookAppointment: paymentAndVerifyBookAppointment,
 }
