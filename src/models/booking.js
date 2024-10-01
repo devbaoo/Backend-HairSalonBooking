@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       Booking.hasOne(models.Feedback, { foreignKey: "bookingId" });
       Booking.belongsTo(models.User, { foreignKey: 'customerId', targetKey: 'id', as: 'customerData' })
       Booking.belongsTo(models.Allcode, { foreignKey: 'timeType', targetKey: 'keyMap', as: 'timeTypeDataBooking' })
-
+      Booking.hasOne(models.Payment, { foreignKey: "bookingId", as: "booking", });
     }
   }
 

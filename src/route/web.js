@@ -52,14 +52,8 @@ let initWebRoutes = (app) => {
   router.get("/api/get-all-services", serviceController.getAllServices);
 
   //Customer API
-  router.post(
-    "/api/customer-book-appointment",
-    customerController.createBookAppointment
-  );
-  router.post(
-    "/api/verify-book-appointment",
-    customerController.postVerifyBookAppointment
-  );
+  router.post("/api/customer-book-appointment", customerController.createBookAppointment);
+  router.post("/api/verify-book-appointment", customerController.paymentAndVerifyBookAppointment);
 
   //Feedback API
   router.post("/api/create-feedback", feedbackController.createFeedback);

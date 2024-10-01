@@ -17,7 +17,7 @@ let getAllStylists = () => {
             });
             resolve({
                 errCode: 0,
-                data: stylists
+                stylists
             });
         } catch (e) {
             reject(e);
