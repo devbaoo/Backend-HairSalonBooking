@@ -15,7 +15,7 @@ app.use(
     origin: "*", // allow to server to accept request from different origin
     methods: "GET, POST, OPTIONS, PUT, PATCH, DELETE",
     allowedHeaders: "X-Requested-With,content-type",
-    credentials: true,
+    credentials: false,
   })
 );
 
