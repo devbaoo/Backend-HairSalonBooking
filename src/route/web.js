@@ -54,12 +54,20 @@ let initWebRoutes = (app) => {
   router.post("/api/create-schedule", stylistController.createSchedule);
 
   //Service API
-  router.post("/api/create-service", serviceController.createService);
+  router.post(
+    "/api/create-service",
+    upload.single("imageFile"),
+    serviceController.createService
+  );
   router.get(
     "/api/get-detail-service-by-id",
     serviceController.getDetailServiceById
   );
-  router.put("/api/update-service", serviceController.updateService);
+  router.put(
+    "/api/update-service",
+    upload.single("imageFile"),
+    serviceController.updateService
+  );
   router.delete("/api/delete-service", serviceController.deleteService);
   router.get("/api/get-all-services", serviceController.getAllServices);
 

@@ -2,7 +2,7 @@ import yesSerService from "../services/yesSerService";
 
 let createService = async (req, res) => {
   try {
-    let response = await yesSerService.createService(req.body);
+    let response = await yesSerService.createService(req.body, req.file);
     return res.status(200).json(response);
   } catch (e) {
     return res.status(200).json({
@@ -25,10 +25,10 @@ let getDetailServiceById = async (req, res) => {
 };
 let updateService = async (req, res) => {
   try {
-    let response = await yesSerService.updateService(req.body);
+    let response = await yesSerService.updateService(req.body, req.file);
     return res.status(200).json(response);
   } catch (e) {
-    return res.status(200).json({
+    return res.status(500).json({
       errCode: -1,
       errMsg: "An error occurred on the server",
     });
