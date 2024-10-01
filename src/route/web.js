@@ -5,9 +5,15 @@ import stylistController from "../controllers/stylistController";
 import serviceController from "../controllers/serviceController";
 import customerController from "../controllers/customerController";
 import feedbackController from "../controllers/feedbackController";
+import multer from "multer";
 
 let router = express.Router();
 
+// Cấu hình multer để lưu trữ file trong bộ nhớ
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+// Web API
 let initWebRoutes = (app) => {
   // Authentication API
   router.post("/api/login", userController.handleLogin);
@@ -16,7 +22,11 @@ let initWebRoutes = (app) => {
   router.put("/api/reset-password/:token", userController.resetPassword);
 
   // User API
-  router.put("/api/edit-user", userController.editUser);
+  router.put(
+    "/api/edit-user",
+    upload.single("imageFile"),
+    userController.editUser
+  );
   router.delete("/api/delete-user", userController.deleteUser);
   router.get("/api/get-all-user", userController.getAllUsers);
   router.get("/api/get-user-by-id", userController.getUserById);
@@ -35,8 +45,10 @@ let initWebRoutes = (app) => {
     "/api/get-schedule-stylist-by-date",
     stylistController.getScheduleByDate
   );
-  router.get('/api/get-list-customer-booking-for-stylist', stylistController.getListCustomerForDoctor);
-
+  router.get(
+    "/api/get-list-customer-booking-for-stylist",
+    stylistController.getListCustomerForDoctor
+  );
 
   //Schedule API
   router.post("/api/create-schedule", stylistController.createSchedule);
@@ -52,8 +64,14 @@ let initWebRoutes = (app) => {
   router.get("/api/get-all-services", serviceController.getAllServices);
 
   //Customer API
-  router.post("/api/customer-book-appointment", customerController.createBookAppointment);
-  router.post("/api/verify-book-appointment", customerController.paymentAndVerifyBookAppointment);
+  router.post(
+    "/api/customer-book-appointment",
+    customerController.createBookAppointment
+  );
+  router.post(
+    "/api/verify-book-appointment",
+    customerController.paymentAndVerifyBookAppointment
+  );
 
   //Feedback API
   router.post("/api/create-feedback", feedbackController.createFeedback);

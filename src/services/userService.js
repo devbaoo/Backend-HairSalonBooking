@@ -6,6 +6,7 @@ const { generateAccessToken, generateRefreshToken } = require("../utils/token");
 const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
 const verifyToken = promisify(jwt.verify);
+import { uploadImage } from "../services/imageService";
 
 require("dotenv").config();
 
@@ -146,7 +147,7 @@ let editUser = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
       // Check for required parameters
-      if (!data.positionId || !data.gender || !data.roleId || !data.id) {
+      if (!data.id) {
         resolve({
           errCode: 1,
           errMessage: "Missing input parameter",
@@ -165,8 +166,20 @@ let editUser = (data) => {
         user.gender = data.gender;
         user.phoneNumber = data.phoneNumber;
         user.positionId = data.positionId;
-        user.image = data.image;
 
+        if (data.imageFile) {
+          try {
+            let imageUrl = await uploadImage(data.imageFile);
+            user.image = imageUrl; // Cập nhật trường ảnh
+          } catch (uploadError) {
+            console.error("Lỗi upload ảnh:", uploadError);
+            resolve({
+              errCode: 2,
+              errMessage: "Lỗi khi upload ảnh",
+            });
+            return;
+          }
+        }
         // Save the updated user
         await user.save();
 
