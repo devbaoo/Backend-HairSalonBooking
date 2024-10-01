@@ -1,12 +1,13 @@
 import db from "../models/index";
+import { uploadImage } from "./imageService";
 
-let createService = (data) => {
-  return new Promise((resolve, reject) => {
+let createService = async (data, file) => {
+  return new Promise(async (resolve, reject) => {
     try {
+      // Kiểm tra các trường cần thiết
       if (
         !data.name ||
         !data.priceId ||
-        !data.image ||
         !data.descriptionHTML ||
         !data.descriptionMarkdown
       ) {
@@ -14,19 +15,36 @@ let createService = (data) => {
           errCode: 1,
           errMessage: "Missing required fields",
         });
-      } else {
-        db.Service.create({
-          image: data.image,
-          name: data.name,
-          descriptionHTML: data.descriptionHTML,
-          descriptionMarkdown: data.descriptionMarkdown,
-          priceId: data.priceId,
-        });
-        resolve({
-          errCode: 0,
-          errMessage: "Create service successfully",
-        });
+        return;
       }
+
+      // Nếu có file ảnh, tiến hành upload ảnh
+      let imageUrl = null;
+      if (file) {
+        try {
+          imageUrl = await uploadImage(file); // Upload ảnh và lấy URL
+        } catch (error) {
+          console.error("Lỗi upload ảnh:", error);
+          resolve({
+            errCode: 2,
+            errMessage: "Lỗi khi upload ảnh",
+          });
+          return;
+        }
+      }
+
+      await db.Service.create({
+        image: imageUrl,
+        name: data.name,
+        descriptionHTML: data.descriptionHTML,
+        descriptionMarkdown: data.descriptionMarkdown,
+        priceId: data.priceId,
+      });
+
+      resolve({
+        errCode: 0,
+        errMessage: "Create service successfully",
+      });
     } catch (e) {
       reject(e);
     }
@@ -61,7 +79,7 @@ let getDetailServiceById = (id) => {
     }
   });
 };
-let updateService = (data) => {
+let updateService = (data, file) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!data.id) {
@@ -75,9 +93,22 @@ let updateService = (data) => {
         if (service) {
           service.name = data.name;
           service.priceId = data.priceId;
-          service.image = data.image;
           service.descriptionHTML = data.descriptionHTML;
           service.descriptionMarkdown = data.descriptionMarkdown;
+
+          if (file) {
+            try {
+              let imageUrl = await uploadImage(file); // Upload ảnh mới và lấy URL
+              service.image = imageUrl; // Cập nhật URL ảnh mới vào cơ sở dữ liệu
+            } catch (error) {
+              console.error("Lỗi upload ảnh:", error);
+              resolve({
+                errCode: 2,
+                errMessage: "Lỗi khi upload ảnh",
+              });
+              return;
+            }
+          }
 
           await service.save();
           resolve({
