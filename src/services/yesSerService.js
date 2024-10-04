@@ -161,12 +161,20 @@ let getAllServices = async () => {
   return new Promise(async (resolve, reject) => {
     try {
       let services = await db.Service.findAll();
+      services = services.map((service) => {
+        if (service.image) {
+          // Không cần chuyển đổi, chỉ trả về URL của ảnh
+          service.image = service.image.toString(); // Đảm bảo rằng bạn trả về chuỗi URL
+        }
+        return service;
+      });
       resolve(services);
     } catch (error) {
       reject(error);
     }
   });
 };
+
 module.exports = {
   createService,
   getDetailServiceById,
