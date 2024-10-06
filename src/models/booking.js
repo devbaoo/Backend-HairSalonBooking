@@ -9,6 +9,9 @@ module.exports = (sequelize, DataTypes) => {
       Booking.belongsTo(models.User, { foreignKey: 'customerId', targetKey: 'id', as: 'customerData' })
       Booking.belongsTo(models.Allcode, { foreignKey: 'timeType', targetKey: 'keyMap', as: 'timeTypeDataBooking' })
       Booking.hasOne(models.Payment, { foreignKey: "bookingId", as: "booking", });
+      Booking.belongsToMany(models.Service, {
+        through: 'BookingService', foreignKey: 'bookingId', otherKey: 'serviceId'
+      });
     }
   }
 

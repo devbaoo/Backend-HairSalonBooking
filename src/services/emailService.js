@@ -74,18 +74,23 @@ let sendEmailInfoBooking = async (dataSend) => {
 
 let getBodyHTMLEmailInfoBooking = (dataSend) => {
   return `
-      <h3>Hello ${dataSend.customerName}!</h3>
-      <p>We are happy to inform you that you have successfully booked an appointment at the Barber Shop. Here are the details of your appointment:</p>
-      <div><b>Time: ${dataSend.time}</b></div>
-      <div><b>Hairdresser: ${dataSend.stylistName}</b></div>
-      <p>Please arrive 5-10 minutes before your appointment time so we can serve you best. If there are any changes to your appointment schedule, please reply to this email for support.</p>
-      <p>If the information is correct, please click the link below to confirm and complete the appointment booking process.</p>
-      <div>
-         <a href="${dataSend.redirectLink}" target="_blank">Click here</a> 
-      </div>
+  <h3>Dear ${dataSend.customerName},</h3>
+  <p>Thank you for booking an appointment at Barber Shop! Please review the details of your booking below:</p>
 
-      <div>Thank you for choosing Barber Shop, we look forward to serving you.</div>
-  `;
+  <div><strong>Appointment Time:</strong> ${dataSend.time}</div>
+  <div><strong>Hairdresser:</strong> ${dataSend.stylistName}</div>
+
+  <p>If everything looks correct, please click the link below to confirm your appointment and proceed with the payment:</p>
+  <div style="margin: 20px 0;">
+    <a href="${dataSend.redirectLink}" target="_blank" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Confirm & Pay</a>
+  </div>
+
+  <p>If you need to make any changes or have questions, feel free to reply to this email for assistance.</p>
+
+  <div>We appreciate your choice of Barber Shop and look forward to seeing you soon!</div>
+  <div>Best regards,<br>Barber Shop Team</div>
+`;
+
 };
 
 module.exports = {
