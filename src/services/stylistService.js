@@ -27,7 +27,7 @@ let getAllStylists = async () => {
       let stylists = await db.User.findAll({
         where: { roleId: "R3" },
         attributes: {
-          exclude: ["password", "image"],
+          exclude: ["password",],
         },
       });
       resolve(stylists);
