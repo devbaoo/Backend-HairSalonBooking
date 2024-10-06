@@ -168,6 +168,19 @@ let getDetailStylistById = (id) => {
 let createSchedule = (scheduleData) => {
   return new Promise(async (resolve, reject) => {
     try {
+
+      if (typeof scheduleData.arrSchedule === 'string') {
+        try {
+          scheduleData.arrSchedule = JSON.parse(scheduleData.arrSchedule);
+        } catch (error) {
+          resolve({
+            errCode: 1,
+            errMsg: "arrSchedule must be a valid JSON array",
+          });
+          return;
+        }
+      }
+
       if (!scheduleData.arrSchedule || !scheduleData.arrSchedule.length) {
         resolve({
           errCode: 1,
@@ -179,10 +192,8 @@ let createSchedule = (scheduleData) => {
       // Extract stylistId and date from the first schedule item
       const stylistId = scheduleData.arrSchedule[0].stylistId;
       const date = scheduleData.arrSchedule[0].date;
-
       // Check for missing stylistId or date
       if (!stylistId) {
-        console.error("stylistId is missing:", scheduleData);
         resolve({
           errCode: 2,
           errMsg: "Missing required parameter: stylistId",
