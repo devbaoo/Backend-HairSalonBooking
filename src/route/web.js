@@ -47,7 +47,7 @@ let initWebRoutes = (app) => {
   );
   router.get(
     "/api/get-list-customer-booking-for-stylist",
-    stylistController.getListCustomerForDoctor
+    stylistController.getListCustomerForStylist
   );
 
   //Schedule API

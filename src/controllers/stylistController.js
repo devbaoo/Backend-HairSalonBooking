@@ -64,9 +64,9 @@ let getScheduleByDate = async (req, res) => {
   }
 };
 
-let getListCustomerForDoctor = async (req, res) => {
+let getListCustomerForStylist = async (req, res) => {
   try {
-    let response = await stylistService.getListCustomerForDoctor(
+    let response = await stylistService.getListCustomerForStylist(
       req.query.stylistId,
       req.query.date
     );
@@ -87,5 +87,5 @@ module.exports = {
   getDetailStylistById: getDetailStylistById,
   createSchedule: createSchedule,
   getScheduleByDate: getScheduleByDate,
-  getListCustomerForDoctor: getListCustomerForDoctor,
+  getListCustomerForStylist: getListCustomerForStylist,
 };
