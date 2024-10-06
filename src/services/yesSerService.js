@@ -5,12 +5,7 @@ let createService = async (data, file) => {
   return new Promise(async (resolve, reject) => {
     try {
       // Kiểm tra các trường cần thiết
-      if (
-        !data.name ||
-        !data.priceId ||
-        !data.descriptionHTML ||
-        !data.descriptionMarkdown
-      ) {
+      if (!data.name || !data.price || !data.description) {
         resolve({
           errCode: 1,
           errMessage: "Missing required fields",
@@ -36,9 +31,8 @@ let createService = async (data, file) => {
       await db.Service.create({
         image: imageUrl,
         name: data.name,
-        descriptionHTML: data.descriptionHTML,
-        descriptionMarkdown: data.descriptionMarkdown,
-        priceId: data.priceId,
+        description: data.description,
+        price: data.price,
       });
 
       resolve({
@@ -92,9 +86,8 @@ let updateService = (data, file) => {
         let service = await db.Service.findByPk(data.id, { raw: false });
         if (service) {
           service.name = data.name;
-          service.priceId = data.priceId;
-          service.descriptionHTML = data.descriptionHTML;
-          service.descriptionMarkdown = data.descriptionMarkdown;
+          service.price = data.price;
+          service.description = data.description;
 
           if (file) {
             try {
