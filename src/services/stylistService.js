@@ -294,7 +294,7 @@ let getScheduleByDate = (stylistId, date) => {
   });
 };
 
-let getListCustomerForDoctor = (stylistId, date) => {
+let getListCustomerForStylist = (stylistId, date) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!stylistId || !date) {
@@ -349,5 +349,5 @@ module.exports = {
   getDetailStylistById: getDetailStylistById,
   createSchedule: createSchedule,
   getScheduleByDate: getScheduleByDate,
-  getListCustomerForDoctor: getListCustomerForDoctor,
+  getListCustomerForStylist: getListCustomerForStylist,
 };
