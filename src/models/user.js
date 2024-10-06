@@ -23,7 +23,6 @@ module.exports = (sequelize, DataTypes) => {
         targetKey: "keyMap",
         as: "roleData",
       });
-      User.hasOne(models.Markdown, { foreignKey: "stylistId" });
       User.hasOne(models.Stylist_Info, { foreignKey: "stylistId" });
       User.hasMany(models.Schedule, {
         foreignKey: "stylistId",
@@ -31,8 +30,10 @@ module.exports = (sequelize, DataTypes) => {
       });
 
       User.hasMany(models.Feedback, { foreignKey: "userId" });
-      User.hasMany(models.Booking, { foreignKey: 'customerId', as: 'customerData' })
-
+      User.hasMany(models.Booking, {
+        foreignKey: "customerId",
+        as: "customerData",
+      });
     }
   }
   User.init(
