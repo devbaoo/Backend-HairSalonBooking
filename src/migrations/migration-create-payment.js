@@ -20,7 +20,10 @@ module.exports = {
             payerEmail: {
                 type: Sequelize.STRING,
             },
-            paymentToken: {
+            paymentId: {
+                type: Sequelize.STRING,
+            },
+            payerId: {
                 type: Sequelize.STRING,
             },
             bookingId: {
