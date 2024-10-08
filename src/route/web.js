@@ -83,6 +83,10 @@ let initWebRoutes = (app) => {
 
   //Feedback API
   router.post("/api/create-feedback", feedbackController.createFeedback);
+  router.get(
+    "/api/get-feedback-by-serviceId",
+    feedbackController.getFeedbackByServiceId
+  );
 
   return app.use("/", router);
 };
