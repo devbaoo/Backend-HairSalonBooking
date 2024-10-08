@@ -1,64 +1,114 @@
-import db from "../models/index";
+const db = require("../models"); // Ensure the models are correctly imported
 
 let createFeedback = async (data) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (
-        !data.userId ||
+        !data.customerId ||
         !data.bookingId ||
         !data.comment ||
         !data.rating ||
         !data.serviceId
       ) {
-        resolve({
+        return resolve({
           errCode: 1,
           errMessage: "Missing required fields",
         });
       }
-      let { userId, bookingId, comment, rating } = data;
-      let service = await db.Service.findByPk(data.ServiceID);
-      if (!service) {
-        resolve({
-          errCode: 2,
-          success: false,
-          errMessage: "Service not found",
-        });
-      }
-      let booking = await db.Booking.findByPk(bookingId);
-      if (!booking) {
-        resolve({
-          errCode: 3,
-          success: false,
-          errMessage: "Booking not found",
-        });
-      }
-      let user = await db.User.findByPk(userId);
+
+      let { customerId, bookingId, comment, rating, serviceId } = data;
+
+      let user = await db.Booking.findOne({ where: { customerId } });
       if (!user) {
-        resolve({
+        return resolve({
           errCode: 4,
           success: false,
           errMessage: "User not found",
         });
       }
+
+      let service = await db.BookingService.findOne({ where: { serviceId } });
+      if (!service) {
+        return resolve({
+          errCode: 2,
+          success: false,
+          errMessage: "Service not found",
+        });
+      }
+
+      let booking = await db.BookingService.findOne({ where: { bookingId } });
+      if (!booking) {
+        return resolve({
+          errCode: 3,
+          success: false,
+          errMessage: "Booking not found",
+        });
+      }
+
       let feedback = await db.Feedback.create({
-        userId,
+        userId: customerId,
         bookingId,
         serviceId,
         comment,
         rating,
       });
+
       resolve({
         errCode: 0,
         success: true,
         message: "Feedback created successfully",
+        feedback,
       });
-      resolve(feedback);
     } catch (error) {
-      reject(error);
+      console.error("Error: ", error);
+      reject({
+        errCode: -1,
+        errMsg: "An error occurred on the server",
+        details: error.message,
+      });
+    }
+  });
+};
+let getFeedbackByServiceId = async (serviceId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!serviceId) {
+        return resolve({
+          errCode: 1,
+          errMessage: "Missing required fields",
+        });
+      }
+
+      let feedback = await db.Feedback.findAll({
+        where: { serviceId },
+        include: [{ model: db.User, attributes: ["firstName", "lastName"] }],
+        raw: true,
+      });
+
+      if (!feedback || feedback.length === 0) {
+        return resolve({
+          errCode: 2,
+          errMessage: "No feedback found for the given service ",
+        });
+      }
+      resolve({
+        errCode: 0,
+        success: true,
+        message: "Feedbacks retrieved successfully",
+        feedback,
+      });
+    } catch (error) {
+      console.error("Error fetching feedback: ", error);
+      reject({
+        errCode: -1,
+        errMsg: "An error occurred on the server",
+        details: error.message,
+      });
     }
   });
 };
 
 module.exports = {
   createFeedback,
+  getFeedbackByServiceId,
 };
