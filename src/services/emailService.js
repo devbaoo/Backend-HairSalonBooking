@@ -74,24 +74,42 @@ let sendEmailInfoBooking = async (dataSend) => {
 
 let getBodyHTMLEmailInfoBooking = (dataSend) => {
   return `
-  <h3>Dear ${dataSend.customerName},</h3>
-  <p>Thank you for booking an appointment at Barber Shop! Please review the details of your booking below:</p>
+  <div style="font-family: 'Helvetica Neue', Arial, sans-serif; color: #333; background-color: #f9f9f9; padding: 40px;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); padding: 20px;">
+      <h2 style="color: #2c3e50; text-align: center;">Booking Confirmation</h2>
 
-  <div><strong>Appointment Time:</strong> ${dataSend.time}</div>
-  <div><strong>Hairdresser:</strong> ${dataSend.stylistName}</div>
+      <p style="font-size: 16px; color: #555;">Hello <strong>${dataSend.customerName}</strong>,</p>
+      <p style="font-size: 16px; color: #555;">Thank you for choosing <strong>Barber Shop</strong>! We're excited to confirm your appointment.</p>
 
-  <p>If everything looks correct, please click the link below to confirm your appointment and proceed with the payment:</p>
-  <div style="margin: 20px 0;">
-    <a href="${dataSend.redirectLink}" target="_blank" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Confirm & Pay</a>
+      <table style="width: 100%; margin: 20px 0; border-spacing: 0;">
+        <tr style="background-color: #f0f0f0;">
+          <td style="padding: 12px; font-weight: bold; color: #333;">Appointment Time</td>
+          <td style="padding: 12px; color: #555;">${dataSend.time}</td>
+        </tr>
+        <tr style="background-color: #fafafa;">
+          <td style="padding: 12px; font-weight: bold; color: #333;">Hairdresser</td>
+          <td style="padding: 12px; color: #555;">${dataSend.stylistName}</td>
+        </tr>
+      </table>
+
+      <p style="font-size: 16px; color: #555;">Please review the details above and confirm your booking by clicking the button below:</p>
+
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${dataSend.redirectLink}" target="_blank" style="background-color: #3498db; color: white; padding: 14px 28px; text-decoration: none; font-size: 16px; border-radius: 8px;">Confirm & Pay</a>
+      </div>
+
+      <p style="font-size: 16px; color: #555;">If you have any questions or need to make changes, feel free to reply to this email, and we’ll be happy to assist.</p>
+
+      <div style="margin-top: 40px; text-align: center;">
+        <p style="font-size: 14px; color: #aaa;">Thank you for choosing Barber Shop. We look forward to serving you!</p>
+        <p style="font-size: 14px; color: #aaa;">Best regards, <br><strong>The Barber Shop Team</strong></p>
+      </div>
+    </div>
   </div>
-
-  <p>If you need to make any changes or have questions, feel free to reply to this email for assistance.</p>
-
-  <div>We appreciate your choice of Barber Shop and look forward to seeing you soon!</div>
-  <div>Best regards,<br>Barber Shop Team</div>
-`;
-
+  `;
 };
+
+
 
 module.exports = {
   sendForgotPasswordEmail,
