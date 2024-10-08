@@ -7,15 +7,18 @@ require("dotenv").config();
 let createBookAppointment = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      // Validate required parameters
       if (!data.email || !data.stylistId || !data.timeType || !data.date ||
-        !data.fullName || !data.selectedGender || !data.address || !data.amount || !data.serviceIds) {
-        resolve({ errCode: 1, errMsg: "Missing required parameter" });
+        !data.fullName || !data.selectedGender || !data.address ||
+        !data.amount || !data.serviceIds) {
+        resolve({
+          errCode: 1,
+          errMsg: "Missing required parameter"
+        });
         return;
       }
 
       let token = uuidv4();
-      // Find or create user
+
       let user = await db.User.findOrCreate({
         where: { email: data.email },
         defaults: {
@@ -27,7 +30,6 @@ let createBookAppointment = (data) => {
         },
       });
 
-      // Check for duplicate booking
       if (user && user[0]) {
         let existingBooking = await db.Booking.findOne({
           where: {
@@ -38,11 +40,13 @@ let createBookAppointment = (data) => {
           },
         });
         if (existingBooking) {
-          resolve({ errCode: 2, errMsg: "Booking already exists for the selected time and date" });
+          resolve({
+            errCode: 2,
+            errMsg: "Booking already exists for the selected time and date"
+          });
           return;
         }
 
-        // Create new booking
         let newBooking = await db.Booking.create({
           statusId: "S1",
           stylistId: data.stylistId,
@@ -52,111 +56,145 @@ let createBookAppointment = (data) => {
           token: token,
         });
 
-        // Convert serviceIds to an array if it is a string
-        if (typeof data.serviceIds === 'string') {
+        if (typeof data.serviceIds === "string") {
           try {
             data.serviceIds = JSON.parse(data.serviceIds);
           } catch (e) {
-            console.log('Failed to parse serviceIds:', e);
-            resolve({ errCode: 1, errMsg: "Invalid serviceIds format" });
+            resolve({
+              errCode: 1,
+              errMsg: "Invalid serviceIds format"
+            });
             return;
           }
         }
 
-        // Add multiple services to the booking
         if (Array.isArray(data.serviceIds) && data.serviceIds.length > 0) {
           const bookingServices = data.serviceIds.map(serviceId => ({
             bookingId: newBooking.id,
-            serviceId: serviceId
+            serviceId: serviceId,
           }));
           await db.BookingService.bulkCreate(bookingServices);
-        } else {
-          console.log('No services selected for booking or serviceIds is not an array.');
         }
 
-        // Create a payment record with status 'Pending'
+        // Call PayPal to create an order
+        let paypalResponse = await paypalService.createBooking(
+          Number(data.amount),
+          `${process.env.URL_BACKEND}/api/payment/success?token=${token}&stylistId=${data.stylistId}`,
+          `${process.env.URL_BACKEND}/api/payment/cancel?token=${token}`
+        );
+        console.log("PayPal response:", paypalResponse);
+
+        // Extract the Payment ID and approval URL
+        let paymentId = paypalResponse.id;  // Extract the Payment ID (PAYID-...)
+        let approvalLink = paypalResponse.links.find(link => link.rel === "approval_url").href;
+
+        // Save the Payment ID (PAYID-...) in the paymentId column
         let payment = await db.Payment.create({
           bookingId: newBooking.id,
           paymentAmount: data.amount,
           paymentStatus: "Pending",
-          paymentToken: null,
+          paymentId: paymentId,  // Save the correct Payment ID here
           paymentMethod: "PayPal",
           payerEmail: data.email,
         });
 
-        // Call PayPal to create payment link
-        let paypalApprovalUrl = await paypalService.createBooking(
-          Number(data.amount),
-          `${process.env.URL_BACKEND}/api/payment/success?token=${token}`,
-          `${process.env.URL_REACT}/payment-cancel`
-        );
-
-        // Send booking email
+        // Send booking confirmation email with PayPal payment URL
         await emailService.sendEmailInfoBooking({
           receiverEmail: data.email,
           customerName: data.fullName,
           time: data.timeString,
           stylistName: data.stylistName,
-          redirectLink: paypalApprovalUrl,
+          redirectLink: approvalLink,  // PayPal payment URL for the customer to approve the payment
         });
 
-        resolve({ errCode: 0, errMsg: "Customer booking appointment successfully" });
+        resolve({
+          errCode: 0,
+          errMsg: "Customer booking appointment successfully",
+          paymentId: paymentId // Return paymentId for frontend usage
+        });
       }
     } catch (e) {
-      console.log('Error occurred during booking:', e);
+      console.log("Error during booking:", e);
       reject(e);
     }
   });
 };
 
-let paymentAndVerifyBookAppointment = async (req, res) => {
-  try {
-    const { paymentToken, stylistId, token } = req.body;
+let paymentAndVerifyBookAppointment = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { paymentId, stylistId, token, payerId } = data;
 
-    if (!paymentToken || !stylistId || !token) {
-      return res.status(400).json({ errCode: 1, errMsg: "Missing required parameters" });
+      if (!paymentId || !stylistId || !token || !payerId) {
+        resolve({
+          errCode: 1,
+          errMsg: "Missing required parameters"
+        });
+        return;
+      }
+
+      let appointment = await db.Booking.findOne({
+        where: {
+          stylistId: stylistId,
+          token: token,
+          statusId: "S1",
+        },
+        include: [{ model: db.Payment, as: "payment" }],
+        raw: true,
+        nest: true
+      });
+
+      if (!appointment) {
+        resolve({
+          errCode: 3,
+          errMsg: "Appointment not found or already verified"
+        });
+        return;
+      }
+
+      // Use the Payment ID (stored in paymentId) to capture the payment
+      let paymentCapture = await paypalService.capturePayment(appointment.payment.paymentId, payerId); // Use Payment ID here
+
+      if (paymentCapture && paymentCapture.state === "approved") {
+        await db.Payment.update(
+          {
+            paymentStatus: "Completed",
+            paymentId: appointment.payment.paymentId, // Ensure Payment ID is used here
+            payerId: payerId // Save the payerId here
+          },
+          {
+            where: { id: appointment.payment.id }
+          }
+        );
+
+        await db.Booking.update(
+          { statusId: "S2" },
+          {
+            where: { id: appointment.id }
+          }
+        );
+
+        resolve({
+          errCode: 0,
+          errMsg: "Payment successful, appointment verified"
+        });
+      } else {
+        await db.Payment.update(
+          { paymentStatus: "Failed" },
+          {
+            where: { id: appointment.payment.id }
+          }
+        );
+        resolve({
+          errCode: 4,
+          errMsg: "Payment failed"
+        });
+      }
+    } catch (e) {
+      console.log("Error during payment verification:", e);
+      reject(e);
     }
-
-    // Find the booking
-    let appointment = await db.Booking.findOne({
-      where: {
-        stylistId: stylistId,
-        token: token,
-        statusId: "S1",
-      },
-      include: { model: db.Payment },
-    });
-
-    if (!appointment) {
-      return res.status(404).json({ errCode: 3, errMsg: "Appointment not found or already verified" });
-    }
-
-    // Capture payment
-    let paymentCapture = await paypalService.capturePayment(paymentToken);
-    console.log("PayPal Capture Response:", paymentCapture);  // Log PayPal response
-
-    // Check if PayPal responded with "COMPLETED" status
-    let payment = await db.Payment.findOne({ where: { bookingId: appointment.id } });
-    if (paymentCapture.status === "COMPLETED") {
-      payment.paymentStatus = "Completed";
-      payment.paymentToken = paymentToken;
-      await payment.save();
-
-      // Update the booking status
-      appointment.statusId = "S2";
-      await appointment.save();
-
-      return res.status(200).json({ errCode: 0, errMsg: "Payment successful, appointment verified" });
-    } else {
-      console.log("PayPal Payment failed:", paymentCapture); // Log failure reason
-      payment.paymentStatus = "Failed";
-      await payment.save();
-      return res.status(400).json({ errCode: 4, errMsg: "Payment failed" });
-    }
-  } catch (error) {
-    console.error("Error during payment verification:", error);
-    return res.status(500).json({ errCode: 5, errMsg: "Internal server error" });
-  }
+  });
 };
 
 module.exports = {

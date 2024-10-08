@@ -77,7 +77,7 @@ let initWebRoutes = (app) => {
     customerController.createBookAppointment
   );
   router.post(
-    "/api/verify-book-appointment",
+    "/api/payment-and-verify-book-appointment",
     customerController.paymentAndVerifyBookAppointment
   );
 
