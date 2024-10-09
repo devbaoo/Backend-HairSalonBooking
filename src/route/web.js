@@ -5,6 +5,7 @@ import stylistController from "../controllers/stylistController";
 import serviceController from "../controllers/serviceController";
 import customerController from "../controllers/customerController";
 import feedbackController from "../controllers/feedbackController";
+import staffController from "../controllers/staffController";
 import multer from "multer";
 
 let router = express.Router();
@@ -22,11 +23,7 @@ let initWebRoutes = (app) => {
   router.put("/api/reset-password/:token", userController.resetPassword);
 
   // User API
-  router.put(
-    "/api/edit-user",
-    upload.single("imageFile"),
-    userController.editUser
-  );
+  router.put("/api/edit-user", upload.single("imageFile"), userController.editUser);
   router.delete("/api/delete-user", userController.deleteUser);
   router.get("/api/get-all-user", userController.getAllUsers);
   router.get("/api/get-user-by-id", userController.getUserById);
@@ -37,56 +34,30 @@ let initWebRoutes = (app) => {
   //Stylist API
   router.get("/api/get-all-stylist", stylistController.getAllStylists);
   router.post("/api/save-info-stylists", stylistController.postInfoStylist);
-  router.get(
-    "/api/get-detail-stylist-by-id",
-    stylistController.getDetailStylistById
-  );
-  router.get(
-    "/api/get-schedule-stylist-by-date",
-    stylistController.getScheduleByDate
-  );
-  router.get(
-    "/api/get-list-customer-booking-for-stylist",
-    stylistController.getListCustomerForStylist
-  );
+  router.get("/api/get-detail-stylist-by-id", stylistController.getDetailStylistById);
+  router.get("/api/get-schedule-stylist-by-date", stylistController.getScheduleByDate);
+  router.get("/api/get-list-customer-booking-for-stylist", stylistController.getListCustomerForStylist);
 
   //Schedule API
   router.post("/api/create-schedule", stylistController.createSchedule);
 
   //Service API
-  router.post(
-    "/api/create-service",
-    upload.single("imageFile"),
-    serviceController.createService
-  );
-  router.get(
-    "/api/get-detail-service-by-id",
-    serviceController.getDetailServiceById
-  );
-  router.put(
-    "/api/update-service",
-    upload.single("imageFile"),
-    serviceController.updateService
-  );
+  router.post("/api/create-service", upload.single("imageFile"), serviceController.createService);
+  router.get("/api/get-detail-service-by-id", serviceController.getDetailServiceById);
+  router.put("/api/update-service", upload.single("imageFile"), serviceController.updateService);
   router.delete("/api/delete-service", serviceController.deleteService);
   router.get("/api/get-all-services", serviceController.getAllServices);
 
   //Customer API
-  router.post(
-    "/api/customer-book-appointment",
-    customerController.createBookAppointment
-  );
-  router.post(
-    "/api/payment-and-verify-book-appointment",
-    customerController.paymentAndVerifyBookAppointment
-  );
+  router.post("/api/customer-book-appointment", customerController.createBookAppointment);
+  router.post("/api/payment-and-verify-book-appointment", customerController.paymentAndVerifyBookAppointment);
 
   //Feedback API
   router.post("/api/create-feedback", feedbackController.createFeedback);
-  router.get(
-    "/api/get-feedback-by-serviceId",
-    feedbackController.getFeedbackByServiceId
-  );
+  router.get("/api/get-feedback-by-serviceId", feedbackController.getFeedbackByServiceId);
+
+  //Staff API
+  router.get("/api/get-all-booking", staffController.getAllBooking);
 
   return app.use("/", router);
 };
