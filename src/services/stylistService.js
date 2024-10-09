@@ -168,7 +168,7 @@ let getDetailStylistById = (id) => {
 let createSchedule = (scheduleData) => {
   return new Promise(async (resolve, reject) => {
     try {
-
+      // Parse scheduleData.arrSchedule if it's a string
       if (typeof scheduleData.arrSchedule === 'string') {
         try {
           scheduleData.arrSchedule = JSON.parse(scheduleData.arrSchedule);
@@ -181,6 +181,7 @@ let createSchedule = (scheduleData) => {
         }
       }
 
+      // Check if arrSchedule is missing or empty
       if (!scheduleData.arrSchedule || !scheduleData.arrSchedule.length) {
         resolve({
           errCode: 1,
@@ -192,6 +193,7 @@ let createSchedule = (scheduleData) => {
       // Extract stylistId and date from the first schedule item
       const stylistId = scheduleData.arrSchedule[0].stylistId;
       const date = scheduleData.arrSchedule[0].date;
+
       // Check for missing stylistId or date
       if (!stylistId) {
         resolve({
@@ -208,8 +210,10 @@ let createSchedule = (scheduleData) => {
         return;
       }
 
+      // Ensure dates in schedule are properly formatted (getTime)
       let schedule = scheduleData.arrSchedule.map((time) => {
         time.maxNumber = MAX_NUMBER_SCHEDULE;
+        time.date = new Date(time.date).getTime(); // Format date for comparison
         return time;
       });
 
@@ -223,7 +227,7 @@ let createSchedule = (scheduleData) => {
         raw: true,
       });
 
-      // Adjust existing schedules' dates to ensure proper comparison
+      // Adjust existing schedules' dates for comparison
       existing = existing.map((time) => {
         time.date = new Date(time.date).getTime(); // Ensure date is in the same format
         return time;
@@ -238,6 +242,7 @@ let createSchedule = (scheduleData) => {
       if (toCreate && toCreate.length > 0) {
         await db.Schedule.bulkCreate(toCreate);
       }
+
       resolve({
         errCode: 0,
         errMsg: "Schedule created successfully!",
@@ -250,6 +255,7 @@ let createSchedule = (scheduleData) => {
     }
   });
 };
+
 
 let getScheduleByDate = (stylistId, date) => {
   return new Promise(async (resolve, reject) => {
