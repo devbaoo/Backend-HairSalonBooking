@@ -206,27 +206,28 @@ let createSchedule = (scheduleData) => {
       let existing = await db.Schedule.findAll({
         where: {
           stylistId: stylistId,
-          date: date
+          date: date // Ensure we're fetching the correct date
         },
         attributes: ['timeType', 'date', 'stylistId', 'maxNumber'],
         raw: true
       });
 
-      // Adjust existing schedules' dates to ensure proper comparison
-      existing = existing.map(time => {
-        time.date = new Date(time.date).getTime(); // Ensure date is in the same format
-        return time;
-      });
-
-      // Use _.differenceWith to find schedules that need to be created
+      // Compare only the timeType since stylistId and date are already fixed
       let toCreate = _.differenceWith(schedule, existing, (a, b) => {
-        return a.timeType === b.timeType && a.date === b.date;
+        return a.timeType === b.timeType;  // Only compare timeType
       });
 
       // If there are new schedules, insert them into the database
       if (toCreate && toCreate.length > 0) {
         await db.Schedule.bulkCreate(toCreate);
+      } else {
+        resolve({
+          errCode: 4,
+          errMsg: 'No new schedule to create, duplicate timeType found!'
+        });
+        return;
       }
+
       resolve({
         errCode: 0,
         errMsg: 'Schedule created successfully!'
@@ -239,6 +240,8 @@ let createSchedule = (scheduleData) => {
     }
   });
 };
+
+
 
 
 let getScheduleByDate = (stylistId, date) => {
