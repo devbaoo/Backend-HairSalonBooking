@@ -15,12 +15,12 @@ let app = express();
 
 // Configure CORS
 app.use(cors());
-app.use(express.json());
 
 
 // Config app
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// Use express's built-in JSON body parser
+app.use(express.json()); // For parsing application/json
+app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 
 viewEngine(app);
 initWebRoutes(app);
