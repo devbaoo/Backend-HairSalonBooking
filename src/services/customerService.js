@@ -8,8 +8,7 @@ let createBookAppointment = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!data.email || !data.stylistId || !data.timeType || !data.date ||
-        !data.fullName || !data.selectedGender || !data.address ||
-        !data.amount || !data.serviceIds) {
+        !data.fullName || !data.amount || !data.serviceIds) {
         resolve({
           errCode: 1,
           errMsg: "Missing required parameter"
@@ -25,8 +24,6 @@ let createBookAppointment = (data) => {
           email: data.email,
           roleId: "R4",
           firstName: data.fullName,
-          address: data.address,
-          gender: data.selectedGender,
         },
       });
 
@@ -79,8 +76,8 @@ let createBookAppointment = (data) => {
         // Call PayPal to create an order
         let paypalResponse = await paypalService.createBooking(
           Number(data.amount),
-          `${process.env.URL_BACKEND}/api/payment/success?token=${token}&stylistId=${data.stylistId}`,
-          `${process.env.URL_BACKEND}/api/payment/cancel?token=${token}`
+          `${process.env.URL_BACKEND}/payment/success?token=${token}&stylistId=${data.stylistId}`,
+          `${process.env.URL_BACKEND}/payment/cancel?token=${token}`
         );
         console.log("PayPal response:", paypalResponse);
 

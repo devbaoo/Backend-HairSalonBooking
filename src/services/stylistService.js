@@ -204,7 +204,10 @@ let createSchedule = (scheduleData) => {
 
       // Fetch existing schedules for the stylist on the specified date
       let existing = await db.Schedule.findAll({
-        where: { stylistId: stylistId, date: date },
+        where: {
+          stylistId: stylistId,
+          date: date
+        },
         attributes: ['timeType', 'date', 'stylistId', 'maxNumber'],
         raw: true
       });
