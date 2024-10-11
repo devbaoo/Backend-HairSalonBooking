@@ -31,8 +31,24 @@ let paymentAndVerifyBookAppointment = async (req, res) => {
     }
 };
 
+let getBookingById = async (req, res) => {
+    try {
+        let response = await customerService.getBookingById(
+            req.query.customerId,
+        );
+        return res.status(200).json(response);
+    } catch (e) {
+        console.log(e);
+        return res.status(200).json({
+            errCode: -1,
+            errMsg: "An error occurred on the server",
+        });
+    }
+};
+
 
 module.exports = {
     createBookAppointment: createBookAppointment,
     paymentAndVerifyBookAppointment: paymentAndVerifyBookAppointment,
+    getBookingById: getBookingById
 }
