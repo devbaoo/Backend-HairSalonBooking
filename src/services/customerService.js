@@ -7,11 +7,18 @@ require("dotenv").config();
 let createBookAppointment = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!data.email || !data.stylistId || !data.timeType || !data.date ||
-        !data.fullName || !data.amount || !data.serviceIds) {
+      if (
+        !data.email ||
+        !data.stylistId ||
+        !data.timeType ||
+        !data.date ||
+        !data.fullName ||
+        !data.amount ||
+        !data.serviceIds
+      ) {
         resolve({
           errCode: 1,
-          errMsg: "Missing required parameter"
+          errMsg: "Missing required parameter",
         });
         return;
       }
@@ -39,7 +46,7 @@ let createBookAppointment = (data) => {
         if (existingBooking) {
           resolve({
             errCode: 2,
-            errMsg: "Booking already exists for the selected time and date"
+            errMsg: "Booking already exists for the selected time and date",
           });
           return;
         }
@@ -59,14 +66,14 @@ let createBookAppointment = (data) => {
           } catch (e) {
             resolve({
               errCode: 1,
-              errMsg: "Invalid serviceIds format"
+              errMsg: "Invalid serviceIds format",
             });
             return;
           }
         }
 
         if (Array.isArray(data.serviceIds) && data.serviceIds.length > 0) {
-          const bookingServices = data.serviceIds.map(serviceId => ({
+          const bookingServices = data.serviceIds.map((serviceId) => ({
             bookingId: newBooking.id,
             serviceId: serviceId,
           }));
@@ -76,21 +83,23 @@ let createBookAppointment = (data) => {
         // Call PayPal to create an order
         let paypalResponse = await paypalService.createBooking(
           Number(data.amount),
-          `${process.env.URL_BACKEND}/payment/success?token=${token}&stylistId=${data.stylistId}`,
-          `${process.env.URL_BACKEND}/payment/cancel?token=${token}`
+          `${process.env.URL_REACT}/payment/success?token=${token}&stylistId=${data.stylistId}`,
+          `${process.env.URL_REACT}/payment/cancel?token=${token}`
         );
         console.log("PayPal response:", paypalResponse);
 
         // Extract the Payment ID and approval URL
-        let paymentId = paypalResponse.id;  // Extract the Payment ID (PAYID-...)
-        let approvalLink = paypalResponse.links.find(link => link.rel === "approval_url").href;
+        let paymentId = paypalResponse.id; // Extract the Payment ID (PAYID-...)
+        let approvalLink = paypalResponse.links.find(
+          (link) => link.rel === "approval_url"
+        ).href;
 
         // Save the Payment ID (PAYID-...) in the paymentId column
         let payment = await db.Payment.create({
           bookingId: newBooking.id,
           paymentAmount: data.amount,
           paymentStatus: "Pending",
-          paymentId: paymentId,  // Save the correct Payment ID here
+          paymentId: paymentId, // Save the correct Payment ID here
           paymentMethod: "PayPal",
           payerEmail: data.email,
         });
@@ -101,13 +110,13 @@ let createBookAppointment = (data) => {
           customerName: data.fullName,
           time: data.timeString,
           stylistName: data.stylistName,
-          redirectLink: approvalLink,  // PayPal payment URL for the customer to approve the payment
+          redirectLink: approvalLink, // PayPal payment URL for the customer to approve the payment
         });
 
         resolve({
           errCode: 0,
           errMsg: "Customer booking appointment successfully",
-          paymentId: paymentId // Return paymentId for frontend usage
+          paymentId: paymentId, // Return paymentId for frontend usage
         });
       }
     } catch (e) {
@@ -125,7 +134,7 @@ let paymentAndVerifyBookAppointment = (data) => {
       if (!paymentId || !stylistId || !token || !payerId) {
         resolve({
           errCode: 1,
-          errMsg: "Missing required parameters"
+          errMsg: "Missing required parameters",
         });
         return;
       }
@@ -138,53 +147,56 @@ let paymentAndVerifyBookAppointment = (data) => {
         },
         include: [{ model: db.Payment, as: "payment" }],
         raw: true,
-        nest: true
+        nest: true,
       });
 
       if (!appointment) {
         resolve({
           errCode: 3,
-          errMsg: "Appointment not found or already verified"
+          errMsg: "Appointment not found or already verified",
         });
         return;
       }
 
       // Use the Payment ID (stored in paymentId) to capture the payment
-      let paymentCapture = await paypalService.capturePayment(appointment.payment.paymentId, payerId); // Use Payment ID here
+      let paymentCapture = await paypalService.capturePayment(
+        appointment.payment.paymentId,
+        payerId
+      ); // Use Payment ID here
 
       if (paymentCapture && paymentCapture.state === "approved") {
         await db.Payment.update(
           {
             paymentStatus: "Completed",
             paymentId: appointment.payment.paymentId, // Ensure Payment ID is used here
-            payerId: payerId // Save the payerId here
+            payerId: payerId, // Save the payerId here
           },
           {
-            where: { id: appointment.payment.id }
+            where: { id: appointment.payment.id },
           }
         );
 
         await db.Booking.update(
           { statusId: "S2" },
           {
-            where: { id: appointment.id }
+            where: { id: appointment.id },
           }
         );
 
         resolve({
           errCode: 0,
-          errMsg: "Payment successful, appointment verified"
+          errMsg: "Payment successful, appointment verified",
         });
       } else {
         await db.Payment.update(
           { paymentStatus: "Failed" },
           {
-            where: { id: appointment.payment.id }
+            where: { id: appointment.payment.id },
           }
         );
         resolve({
           errCode: 4,
-          errMsg: "Payment failed"
+          errMsg: "Payment failed",
         });
       }
     } catch (e) {
@@ -301,3 +313,4 @@ module.exports = {
   getBookingById,
   cancelBookingForCustomer,
 };
+
