@@ -33,11 +33,7 @@ let initWebRoutes = (app) => {
   router.delete("/api/delete-user", userController.deleteUser);
   router.get("/api/get-all-user", userController.getAllUsers);
   router.get("/api/get-user-by-id", userController.getUserById);
-  router.put(
-    "/api/change-user-status",
-    auth.authenticateToken,
-    userController.changeUserStatus
-  );
+  router.put("/api/change-user-status", userController.changeUserStatus);
 
   //AllCode API
   router.get("/api/get-allcode", allCodeController.getAllCodeService);
