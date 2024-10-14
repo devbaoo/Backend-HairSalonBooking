@@ -7,6 +7,7 @@ import customerController from "../controllers/customerController";
 import feedbackController from "../controllers/feedbackController";
 import staffController from "../controllers/staffController";
 import salariesController from "../controllers/salariesController";
+import dashboardController from "../controllers/dashboardController";
 import auth from "../middleware/auth";
 import multer from "multer";
 
@@ -111,6 +112,25 @@ let initWebRoutes = (app) => {
     "/api/get-salaries-by-month-and-year",
     salariesController.getSalariesByMonthAndYear
   );
+  //Dashboard API
+  router.get("/api/total-users", dashboardController.totalUser);
+  router.get("/api/total-services", dashboardController.totalServices);
+  router.get("/api/revenue", dashboardController.revenue);
+  router.get("/api/total-bookings", dashboardController.totalBookings);
+  router.get(
+    "/api/total-comfirmed-booking",
+    dashboardController.confirmedBooking
+  );
+  router.get(
+    "/api/total-completed-booking",
+    dashboardController.completedBooking
+  );
+  router.get(
+    "/api/total-canceled-booking",
+    dashboardController.canceledBooking
+  );
+  router.get("/api/total-feedback", dashboardController.totalFeedback);
+  router.get("/api/total-stylists", dashboardController.totalStylist);
 
   return app.use("/", router);
 };
