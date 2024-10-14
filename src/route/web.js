@@ -7,6 +7,7 @@ import customerController from "../controllers/customerController";
 import feedbackController from "../controllers/feedbackController";
 import staffController from "../controllers/staffController";
 import salariesController from "../controllers/salariesController";
+import auth from "../middleware/auth";
 import multer from "multer";
 
 let router = express.Router();
@@ -32,7 +33,11 @@ let initWebRoutes = (app) => {
   router.delete("/api/delete-user", userController.deleteUser);
   router.get("/api/get-all-user", userController.getAllUsers);
   router.get("/api/get-user-by-id", userController.getUserById);
-  router.put("/api/change-user-status", userController.changeUserStatus);
+  router.put(
+    "/api/change-user-status",
+    auth.authenticateToken,
+    userController.changeUserStatus
+  );
 
   //AllCode API
   router.get("/api/get-allcode", allCodeController.getAllCodeService);

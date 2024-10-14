@@ -13,4 +13,20 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-module.exports = authenticateToken;
+const authorize = (roleId = []) => {
+  return (req, res, next) => {
+    console.log("User Role ID:", req.user.roleId); // Thêm log để kiểm tra
+    console.log("Allowed Roles:", roleId);
+
+    // Kiểm tra nếu vai trò của người dùng nằm trong danh sách roles được cho phép
+    if (!roleId.includes(req.user.roleId)) {
+      return res.sendStatus(403); // Forbidden
+    }
+    next();
+  };
+};
+
+module.exports = {
+  authenticateToken,
+  authorize,
+};
