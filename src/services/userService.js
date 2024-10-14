@@ -354,6 +354,43 @@ let getUserById = async (userId) => {
     }
   });
 };
+let changeUserStatus = async ({ id, status }) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!id || !status) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parameter",
+        });
+        return;
+      }
+
+      let user = await db.User.findOne({
+        where: { id: id },
+        raw: false,
+      });
+
+      if (user) {
+        user.status = status;
+        await user.save();
+        resolve({
+          errCode: 0,
+          errMessage: "User status updated successfully",
+          id: id,
+          status: status,
+        });
+      } else {
+        resolve({
+          errCode: 2,
+          errMessage: "User not found",
+        });
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
 module.exports = {
   handleUserLogin: handleUserLogin,
   handleRegister: handleRegister,
@@ -363,4 +400,5 @@ module.exports = {
   forgotPassword: forgotPassword,
   resetPassword: resetPassword,
   getUserById: getUserById,
+  changeUserStatus: changeUserStatus,
 };
