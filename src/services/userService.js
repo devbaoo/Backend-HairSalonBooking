@@ -354,10 +354,10 @@ let getUserById = async (userId) => {
     }
   });
 };
-let changeUserStatus = async ({ id, status }) => {
+let changeUserStatus = async (id) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!id || !status) {
+      if (!id) {
         resolve({
           errCode: 1,
           errMessage: "Missing required parameter",
@@ -371,13 +371,13 @@ let changeUserStatus = async ({ id, status }) => {
       });
 
       if (user) {
-        user.status = status;
+        user.status = user.status === "Active" ? "Inactive" : "Active";
         await user.save();
         resolve({
           errCode: 0,
           errMessage: "User status updated successfully",
           id: id,
-          status: status,
+          status: user.status,
         });
       } else {
         resolve({

@@ -106,11 +106,8 @@ let getUserById = async (req, res) => {
 };
 let changeUserStatus = async (req, res) => {
   try {
-    let data = {
-      id: req.body.id,
-      status: req.body.status,
-    };
-    let result = await userService.changeUserStatus(data);
+    let id = req.query.id;
+    let result = await userService.changeUserStatus(id);
     res.status(200).json(result);
   } catch (error) {
     res.status(400).json({ error: error.message });
