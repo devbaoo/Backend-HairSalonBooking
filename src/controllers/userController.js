@@ -104,6 +104,18 @@ let getUserById = async (req, res) => {
     });
   }
 };
+let changeUserStatus = async (req, res) => {
+  try {
+    let data = {
+      id: req.body.id,
+      status: req.body.status,
+    };
+    let result = await userService.changeUserStatus(data);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
 
 module.exports = {
   handleLogin: handleLogin,
@@ -114,4 +126,5 @@ module.exports = {
   sendEmailforgotPassword: sendEmailforgotPassword,
   resetPassword: resetPassword,
   getUserById: getUserById,
+  changeUserStatus: changeUserStatus,
 };
