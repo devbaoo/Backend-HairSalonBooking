@@ -86,6 +86,7 @@ let initWebRoutes = (app) => {
     customerController.paymentAndVerifyBookAppointment
   );
   router.get("/api/get-booking-by-id", customerController.getBookingById);
+  router.put("/api/cancel-booking-for-customer", customerController.cancelBookingForCustomer);
 
   //Feedback API
   router.post("/api/create-feedback", feedbackController.createFeedback);
