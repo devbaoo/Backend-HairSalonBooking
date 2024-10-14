@@ -242,8 +242,62 @@ let getBookingById = (customerId) => {
   });
 };
 
+let cancelBookingForCustomer = (bookingId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!bookingId) {
+        reject({
+          errCode: 1,
+          errMsg: "Missing required parameter",
+        });
+        return;
+      }
+
+      // Tìm booking với id và statusId = "S1"
+      let booking = await db.Booking.findOne({
+        where: {
+          id: bookingId,
+          statusId: "S1",
+        },
+      });
+
+      // Kiểm tra nếu booking tồn tại
+      if (booking) {
+        // Cập nhật statusId của booking và paymentStatus của bảng Payment
+        await db.Booking.update(
+          { statusId: "S4" }, // chuyển từ S1 sang S4
+          { where: { id: bookingId } }
+        );
+
+        await db.Payment.update(
+          { paymentStatus: "Failed" }, // chuyển paymentStatus từ Pending sang Failed
+          { where: { bookingId: bookingId, paymentStatus: "Pending" } }
+        );
+
+        resolve({
+          errCode: 0,
+          errMsg: "Booking canceled successfully",
+        });
+      } else {
+        reject({
+          errCode: 2,
+          errMsg: "Booking not found or not in valid status",
+        });
+      }
+    } catch (e) {
+      reject({
+        errCode: 3,
+        errMsg: "An error occurred",
+        error: e,
+      });
+    }
+  });
+};
+
+
 module.exports = {
   createBookAppointment,
   paymentAndVerifyBookAppointment,
   getBookingById,
+  cancelBookingForCustomer,
 };
