@@ -6,11 +6,24 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Booking.hasOne(models.Feedback, { foreignKey: "bookingId" });
-      Booking.belongsTo(models.User, { foreignKey: 'customerId', targetKey: 'id', as: 'customerData' })
-      Booking.belongsTo(models.Allcode, { foreignKey: 'timeType', targetKey: 'keyMap', as: 'timeTypeDataBooking' })
-      Booking.hasOne(models.Payment, { foreignKey: "bookingId", as: "payment", });
+      Booking.belongsTo(models.User, {
+        foreignKey: "customerId",
+        targetKey: "id",
+        as: "customerData",
+      });
+      Booking.belongsTo(models.Allcode, {
+        foreignKey: "timeType",
+        targetKey: "keyMap",
+        as: "timeTypeDataBooking",
+      });
+      Booking.hasOne(models.Payment, {
+        foreignKey: "bookingId",
+        as: "payment",
+      });
       Booking.belongsToMany(models.Service, {
-        through: 'BookingService', foreignKey: 'bookingId', otherKey: 'serviceId'
+        through: "BookingService",
+        foreignKey: "bookingId",
+        otherKey: "serviceId",
       });
     }
   }
@@ -23,7 +36,6 @@ module.exports = (sequelize, DataTypes) => {
       date: DataTypes.BIGINT,
       timeType: DataTypes.STRING,
       token: DataTypes.STRING,
-      ServiceID: DataTypes.INTEGER,
     },
     {
       sequelize,
