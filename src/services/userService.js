@@ -166,6 +166,7 @@ let editUser = (data) => {
         user.gender = data.gender;
         user.phoneNumber = data.phoneNumber;
         user.positionId = data.positionId;
+        user.points = data.points;
 
         if (data.imageFile) {
           try {
@@ -390,6 +391,39 @@ let changeUserStatus = async (id) => {
     }
   });
 };
+let getUserPoints = async (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!id) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parameter",
+        });
+        return;
+      }
+      let user = await db.User.findOne({
+        where: { id: id },
+      });
+      if (user) {
+        resolve({
+          errCode: 0,
+          points: user.points,
+        });
+      } else {
+        resolve({
+          errCode: 2,
+          errMessage: "User not found",
+        });
+      }
+    } catch (e) {
+      reject({
+        errCode: 3,
+        errMessage: "An error occurred",
+        error: e,
+      });
+    }
+  });
+};
 
 module.exports = {
   handleUserLogin: handleUserLogin,
@@ -401,4 +435,5 @@ module.exports = {
   resetPassword: resetPassword,
   getUserById: getUserById,
   changeUserStatus: changeUserStatus,
+  getUserPoints: getUserPoints,
 };

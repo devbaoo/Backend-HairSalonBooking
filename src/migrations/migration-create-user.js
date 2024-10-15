@@ -47,6 +47,11 @@ module.exports = {
       resetPasswordExpires: {
         type: Sequelize.DATE,
       },
+      points: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+      },
       status: {
         type: Sequelize.STRING,
         allowNull: false,

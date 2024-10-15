@@ -51,6 +51,20 @@ let createBookAppointment = (data) => {
           return;
         }
 
+        // Tính discount nếu dùng điểm
+        let discount = 0;
+        if (data.usePoints) {
+          const pointsToUse = Math.min(user[0].points, data.pointsToUse);
+          discount = pointsToUse * 0.1; // 10 points = 1$
+
+          // Giảm số điểm của user
+          await db.User.update(
+            { points: user[0].points - pointsToUse },
+            { where: { id: user[0].id } }
+          );
+        }
+
+        // Tạo booking mới
         let newBooking = await db.Booking.create({
           statusId: "S1",
           stylistId: data.stylistId,
@@ -80,43 +94,44 @@ let createBookAppointment = (data) => {
           await db.BookingService.bulkCreate(bookingServices);
         }
 
-        // Call PayPal to create an order
+        // Gọi PayPal để tạo yêu cầu thanh toán, áp dụng discount vào số tiền cuối cùng
+        let totalAmountAfterDiscount = data.amount - discount;
         let paypalResponse = await paypalService.createBooking(
-          Number(data.amount),
+          totalAmountAfterDiscount, // Áp dụng số tiền đã trừ discount
           `${process.env.URL_REACT}/payment/success?token=${token}&stylistId=${data.stylistId}`,
           `${process.env.URL_REACT}/payment/cancel?token=${token}`
         );
         console.log("PayPal response:", paypalResponse);
 
-        // Extract the Payment ID and approval URL
-        let paymentId = paypalResponse.id; // Extract the Payment ID (PAYID-...)
+        // Trích xuất Payment ID và approval URL từ phản hồi của PayPal
+        let paymentId = paypalResponse.id;
         let approvalLink = paypalResponse.links.find(
           (link) => link.rel === "approval_url"
         ).href;
 
-        // Save the Payment ID (PAYID-...) in the paymentId column
+        // Lưu thông tin Payment vào database
         let payment = await db.Payment.create({
           bookingId: newBooking.id,
-          paymentAmount: data.amount,
+          paymentAmount: totalAmountAfterDiscount, // Số tiền thanh toán đã trừ discount
           paymentStatus: "Pending",
-          paymentId: paymentId, // Save the correct Payment ID here
+          paymentId: paymentId,
           paymentMethod: "PayPal",
           payerEmail: data.email,
         });
 
-        // Send booking confirmation email with PayPal payment URL
+        // Gửi email xác nhận booking và link PayPal
         await emailService.sendEmailInfoBooking({
           receiverEmail: data.email,
           customerName: data.fullName,
           time: data.timeString,
           stylistName: data.stylistName,
-          redirectLink: approvalLink, // PayPal payment URL for the customer to approve the payment
+          redirectLink: approvalLink, // Link PayPal để khách hàng phê duyệt thanh toán
         });
 
         resolve({
           errCode: 0,
           errMsg: "Customer booking appointment successfully",
-          paymentId: paymentId, // Return paymentId for frontend usage
+          paymentId: paymentId, // Trả về paymentId cho frontend sử dụng
         });
       }
     } catch (e) {
@@ -306,11 +321,9 @@ let cancelBookingForCustomer = (bookingId) => {
   });
 };
 
-
 module.exports = {
   createBookAppointment,
   paymentAndVerifyBookAppointment,
   getBookingById,
   cancelBookingForCustomer,
 };
-

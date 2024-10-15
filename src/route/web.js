@@ -35,6 +35,7 @@ let initWebRoutes = (app) => {
   router.get("/api/get-all-user", userController.getAllUsers);
   router.get("/api/get-user-by-id", userController.getUserById);
   router.put("/api/change-user-status", userController.changeUserStatus);
+  router.get("/api/get-user-points", userController.getUserPoints);
 
   //AllCode API
   router.get("/api/get-allcode", allCodeController.getAllCodeService);
@@ -86,7 +87,10 @@ let initWebRoutes = (app) => {
     customerController.paymentAndVerifyBookAppointment
   );
   router.get("/api/get-booking-by-id", customerController.getBookingById);
-  router.put("/api/cancel-booking-for-customer", customerController.cancelBookingForCustomer);
+  router.put(
+    "/api/cancel-booking-for-customer",
+    customerController.cancelBookingForCustomer
+  );
 
   //Feedback API
   router.post("/api/create-feedback", feedbackController.createFeedback);
