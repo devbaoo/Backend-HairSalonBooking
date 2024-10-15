@@ -13,8 +13,22 @@ let getAllBooking = async (req, res) => {
     }
 };
 
+let cancelBookingForStaff = async (req, res) => {
+    try {
+        let response = await staffService.cancelBookingForStaff(req.body);
+        res.status(200).json(response);
+    } catch (error) {
+        console.error(error);
+        res.status(200).json({
+            errCode: 1,
+            message: "Internal Server Error",
+        });
+    }
+};
+
 
 
 module.exports = {
-    getAllBooking: getAllBooking
+    getAllBooking: getAllBooking,
+    cancelBookingForStaff: cancelBookingForStaff
 }
