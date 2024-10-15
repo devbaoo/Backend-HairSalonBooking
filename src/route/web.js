@@ -101,6 +101,7 @@ let initWebRoutes = (app) => {
 
   //Staff API
   router.get("/api/get-all-booking", staffController.getAllBooking);
+  router.post("/api/cancel-booking-for-staff", staffController.cancelBookingForStaff)
 
   // Salary API
   router.post("/api/caculate-salary", salariesController.calculateSalary);

@@ -109,9 +109,57 @@ let getBodyHTMLEmailInfoBooking = (dataSend) => {
   `;
 };
 
+let sendEmailCancelBooking = async (dataSend) => {
+  let transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // Use `true` for port 465, `false` for all other ports
+    auth: {
+      user: process.env.EMAIL_APP,
+      pass: process.env.EMAIL_APP_PASSWORD,
+    },
+  });
+
+  // Send mail with defined transport object
+  let info = await transporter.sendMail({
+    from: '"HairCare" <HairCare@company.com>', // sender address
+    to: dataSend.receiverEmail, // recipient
+    subject: "Your Haircut Appointment Has Been Canceled", // Subject line
+    html: getBodyHTMLEmailCancelBooking(dataSend),
+  });
+};
+
+let getBodyHTMLEmailCancelBooking = (dataSend) => {
+  return `
+  <div style="font-family: 'Helvetica Neue', Arial, sans-serif; color: #333; background-color: #f9f9f9; padding: 40px;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); padding: 20px;">
+      <h2 style="color: #e74c3c; text-align: center;">Booking Cancellation</h2>
+
+      <p style="font-size: 16px; color: #555;">Hello <strong>${dataSend.customerName}</strong>,</p>
+      <p style="font-size: 16px; color: #555;">We're sorry to inform you that your appointment with <strong>${dataSend.stylistName}</strong> on <strong>${dataSend.time}</strong> has been canceled.</p>
+
+      <p style="font-size: 16px; color: #555;">If you have any questions or wish to reschedule, please feel free to contact us.</p>
+
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${dataSend.contactLink}" target="_blank" style="background-color: #e74c3c; color: white; padding: 14px 28px; text-decoration: none; font-size: 16px; border-radius: 8px;">Contact Us</a>
+      </div>
+
+      <p style="font-size: 16px; color: #555;">We hope to have the chance to serve you in the future.</p>
+
+      <div style="margin-top: 40px; text-align: center;">
+        <p style="font-size: 14px; color: #aaa;">Thank you for understanding, and we apologize for any inconvenience.</p>
+        <p style="font-size: 14px; color: #aaa;">Best regards, <br><strong>The Barber Shop Team</strong></p>
+      </div>
+    </div>
+  </div>
+  `;
+};
+
+
 
 
 module.exports = {
   sendForgotPasswordEmail,
   sendEmailInfoBooking,
+  sendEmailCancelBooking
 };
