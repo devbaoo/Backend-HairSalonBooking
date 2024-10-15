@@ -36,6 +36,7 @@ module.exports = (sequelize, DataTypes) => {
       date: DataTypes.BIGINT,
       timeType: DataTypes.STRING,
       token: DataTypes.STRING,
+      pointsAwarded: DataTypes.BOOLEAN,
     },
     {
       sequelize,
