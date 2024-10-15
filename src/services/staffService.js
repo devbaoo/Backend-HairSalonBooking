@@ -56,11 +56,10 @@ let cancelBookingForStaff = (data) => {
                 return;
             }
 
-            // Find the booking by bookingId and statusId "S2"
             let booking = await db.Booking.findOne({
                 where: {
                     id: data.bookingId,
-                    statusId: "S2", // Active booking
+                    statusId: "S2",
                 },
                 include: [
                     {
@@ -78,24 +77,21 @@ let cancelBookingForStaff = (data) => {
                 nest: true,
             });
             if (booking) {
-                // Send cancellation email to the customer
                 let dataSend = {
-                    receiverEmail: data.email, // Customer's email
-                    customerName: data.firstName, // Customer's name
-                    stylistName: data.stylistName, // Stylist's name
-                    time: data.timeString, // Appointment time (assuming it's in valueEn)
-                    contactLink: "https://yourwebsite.com/contact" // Link for contacting
+                    receiverEmail: data.email,
+                    customerName: data.firstName,
+                    stylistName: data.stylistName,
+                    time: data.timeString,
+                    contactLink: "https://yourwebsite.com/contact"
                 };
 
                 await emailService.sendEmailCancelBooking(dataSend);
 
-                // Update the booking status to "S4" (canceled)
                 await db.Booking.update(
                     { statusId: "S4" },
                     { where: { id: data.bookingId } }
                 );
 
-                // Update the payment status to "Failed" if it was previously "Completed"
                 await db.Payment.update(
                     { paymentStatus: "Failed" },
                     { where: { bookingId: data.bookingId, paymentStatus: "Completed" } }
