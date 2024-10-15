@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
 const verifyToken = promisify(jwt.verify);
 import { uploadImage } from "../services/imageService";
+import { raw } from "body-parser";
 
 require("dotenv").config();
 
@@ -424,6 +425,78 @@ let getUserPoints = async (id) => {
     }
   });
 };
+let updateUserPoints = async (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // Lấy tất cả các booking của user
+      let bookings = await db.Booking.findAll({
+        where: { customerId: id, pointsAwarded: false },
+        raw: false,
+      });
+      console.log("Bookings found:", bookings);
+
+      if (bookings && bookings.length > 0) {
+        let pointsToAdd = 0;
+        let bookingsToUpdate = [];
+
+        // Lặp qua tất cả các booking và kiểm tra statusId
+        bookings.forEach((booking) => {
+          if (booking.statusId === "S3") {
+            pointsToAdd += 10; // Cộng 10 điểm cho mỗi booking có statusId là "S3"
+            bookingsToUpdate.push(booking);
+          }
+        });
+
+        if (pointsToAdd > 0) {
+          let user = await User.findOne({
+            where: { id: id },
+            raw: false,
+          });
+          console.log("User found:", user);
+
+          if (user) {
+            // Cộng tổng số điểm dựa trên các booking hợp lệ
+            user.points += pointsToAdd;
+            await user.save();
+
+            // Cập nhật các booking để set pointsAwarded thành true
+            await Promise.all(
+              bookingsToUpdate.map((booking) => {
+                booking.pointsAwarded = true;
+                return booking.save();
+              })
+            );
+
+            resolve({
+              message: "User points updated successfully",
+              points: user.points,
+            });
+          } else {
+            reject({
+              errCode: 1,
+              errMessage: "User not found",
+            });
+          }
+        } else {
+          resolve({
+            message:
+              "No points updated as none of the bookings have statusId 'S3'",
+          });
+        }
+      } else {
+        resolve({
+          message: "No bookings found for the user",
+        });
+      }
+    } catch (e) {
+      reject({
+        errCode: 3,
+        errMessage: "An error occurred",
+        error: e,
+      });
+    }
+  });
+};
 
 module.exports = {
   handleUserLogin: handleUserLogin,
@@ -436,4 +509,5 @@ module.exports = {
   getUserById: getUserById,
   changeUserStatus: changeUserStatus,
   getUserPoints: getUserPoints,
+  updateUserPoints: updateUserPoints,
 };

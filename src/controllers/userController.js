@@ -122,6 +122,20 @@ let getUserPoints = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+let updateUserPoints = async (req, res) => {
+  try {
+    let data = req.query.id;
+    let result = await userService.updateUserPoints(data);
+    res.status(200).json(result);
+  } catch (error) {
+    console.log("Error occurred:", error); // Log chi tiết lỗi
+    res.status(400).json({
+      errCode: error.errCode || 3,
+      errMessage: error.errMessage || "An error occurred",
+      error: error.error || error.message,
+    });
+  }
+};
 
 module.exports = {
   handleLogin: handleLogin,
@@ -134,4 +148,5 @@ module.exports = {
   getUserById: getUserById,
   changeUserStatus: changeUserStatus,
   getUserPoints: getUserPoints,
+  updateUserPoints: updateUserPoints,
 };

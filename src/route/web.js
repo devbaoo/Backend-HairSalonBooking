@@ -36,6 +36,7 @@ let initWebRoutes = (app) => {
   router.get("/api/get-user-by-id", userController.getUserById);
   router.put("/api/change-user-status", userController.changeUserStatus);
   router.get("/api/get-user-points", userController.getUserPoints);
+  router.put("/api/update-user-points", userController.updateUserPoints);
 
   //AllCode API
   router.get("/api/get-allcode", allCodeController.getAllCodeService);
