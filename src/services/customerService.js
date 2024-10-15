@@ -125,6 +125,7 @@ let createBookAppointment = (data) => {
           customerName: data.fullName,
           time: data.timeString,
           stylistName: data.stylistName,
+          amount: data.amount,
           redirectLink: approvalLink, // Link PayPal để khách hàng phê duyệt thanh toán
         });
 
