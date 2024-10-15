@@ -90,6 +90,10 @@ let getBodyHTMLEmailInfoBooking = (dataSend) => {
           <td style="padding: 12px; font-weight: bold; color: #333;">Hairdresser</td>
           <td style="padding: 12px; color: #555;">${dataSend.stylistName}</td>
         </tr>
+        <tr style="background-color: #f0f0f0;">
+          <td style="padding: 12px; font-weight: bold; color: #333;">Amount</td>
+          <td style="padding: 12px; color: #555;">${dataSend.amount}</td>
+        </tr>
       </table>
 
       <p style="font-size: 16px; color: #555;">Please review the details above and confirm your booking by clicking the button below:</p>
