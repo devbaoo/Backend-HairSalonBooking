@@ -156,7 +156,6 @@ let getAllServices = async () => {
       let services = await db.Service.findAll();
       services = services.map((service) => {
         if (service.image) {
-          // Không cần chuyển đổi, chỉ trả về URL của ảnh
           service.image = service.image.toString(); // Đảm bảo rằng bạn trả về chuỗi URL
         }
         return service;

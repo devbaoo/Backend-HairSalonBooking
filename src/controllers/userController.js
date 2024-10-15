@@ -113,6 +113,15 @@ let changeUserStatus = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+let getUserPoints = async (req, res) => {
+  try {
+    let id = req.query.id;
+    let result = await userService.getUserPoints(id);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
 
 module.exports = {
   handleLogin: handleLogin,
@@ -124,4 +133,5 @@ module.exports = {
   resetPassword: resetPassword,
   getUserById: getUserById,
   changeUserStatus: changeUserStatus,
+  getUserPoints: getUserPoints,
 };
