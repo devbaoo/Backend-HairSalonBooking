@@ -3,6 +3,7 @@ import db from "../models/index";
 import { where } from "sequelize";
 import _, { includes } from "lodash";
 import { raw } from "body-parser";
+import emailService from "./emailService";
 const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
 
 // let getAllStylists = () => {
@@ -336,6 +337,52 @@ let getListCustomerForStylist = (stylistId, date) => {
   });
 };
 
+
+let completeService = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!data.email || !data.stylistId || !data.customerId) {
+        resolve({
+          errCode: 1,
+          errMsg: 'Missing required parameter'
+        });
+        return;
+      } else {
+        let appointment = await db.Booking.findOne({
+          where: {
+            customerId: data.customerId,
+            stylistId: data.stylistId,
+            statusId: 'S2'
+          },
+          raw: false
+        });
+
+        if (appointment) {
+          appointment.statusId = 'S3';
+          await appointment.save();
+        }
+
+        await emailService.sendEmailCompleteService({
+          receiverEmail: data.email, // Ensure receiverEmail is set correctly
+          stylistName: data.stylistName,
+          customerName: data.customerName,
+          serviceDate: data.serviceDate,
+          serviceTime: data.serviceTime,
+          feedbackLink: data.feedbackLink // Include feedback link if needed
+        });
+
+        resolve({
+          errCode: 0,
+          errMsg: 'Ok'
+        });
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+
 module.exports = {
   getAllStylists: getAllStylists,
   saveDetailInfoStylist: saveDetailInfoStylist,
@@ -343,4 +390,5 @@ module.exports = {
   createSchedule: createSchedule,
   getScheduleByDate: getScheduleByDate,
   getListCustomerForStylist: getListCustomerForStylist,
+  completeService: completeService
 };

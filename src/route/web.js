@@ -56,6 +56,8 @@ let initWebRoutes = (app) => {
     "/api/get-list-customer-booking-for-stylist",
     stylistController.getListCustomerForStylist
   );
+  router.post("/api/complete-service", stylistController.completeService);
+
 
   //Schedule API
   router.post("/api/create-schedule", stylistController.createSchedule);
@@ -102,7 +104,7 @@ let initWebRoutes = (app) => {
 
   //Staff API
   router.get("/api/get-all-booking", staffController.getAllBooking);
-  router.post("/api/cancel-booking-for-staff", staffController.cancelBookingForStaff)
+  router.post("/api/cancel-booking-for-staff", staffController.cancelBookingForStaff);
 
   // Salary API
   router.post("/api/caculate-salary", salariesController.calculateSalary);
