@@ -113,11 +113,7 @@ let cancelBookingForStaff = (data) => {
     });
 };
 
-
-
-
-
 module.exports = {
     getAllBooking: getAllBooking,
-    cancelBookingForStaff: cancelBookingForStaff
+    cancelBookingForStaff: cancelBookingForStaff,
 };

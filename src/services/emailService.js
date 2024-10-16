@@ -159,11 +159,56 @@ let getBodyHTMLEmailCancelBooking = (dataSend) => {
   `;
 };
 
+let sendEmailCompleteService = async (dataSend) => {
+  let transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.EMAIL_APP,
+      pass: process.env.EMAIL_APP_PASSWORD,
+    },
+  });
+
+  // Send mail with defined transport object
+  let info = await transporter.sendMail({
+    from: '"HairCare" <HairCare@company.com>', // sender address
+    to: dataSend.receiverEmail, // recipient
+    subject: "Thank You for Using Our Service!", // Subject line
+    html: getBodyHTMLEmailCompleteService(dataSend),
+  });
+};
+let getBodyHTMLEmailCompleteService = (dataSend) => {
+  return `
+  <div style="font-family: 'Helvetica Neue', Arial, sans-serif; color: #333; background-color: #f9f9f9; padding: 40px;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); padding: 20px;">
+      <h2 style="color: #2ecc71; text-align: center;">Thank You for Choosing Us!</h2>
+
+      <p style="font-size: 16px; color: #555;">Hello <strong>${dataSend.customerName}</strong>,</p>
+      <p style="font-size: 16px; color: #555;">Thank you for trusting our service. We hope you had a great experience with stylist <strong>${dataSend.stylistName}</strong> on <strong>${dataSend.serviceDate}</strong> at <strong>${dataSend.serviceTime}</strong>.</p>
+
+      <p style="font-size: 16px; color: #555;">We are always looking to improve our services, and we'd love to hear your feedback. Please take a moment to share your experience with us:</p>
+
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${dataSend.feedbackLink}" target="_blank" style="background-color: #2ecc71; color: white; padding: 14px 28px; text-decoration: none; font-size: 16px; border-radius: 8px;">Give Feedback</a>
+      </div>
+
+      <p style="font-size: 16px; color: #555;">Once again, thank you for choosing our service. We look forward to serving you again!</p>
+
+      <div style="margin-top: 40px; text-align: center;">
+        <p style="font-size: 14px; color: #aaa;">Best regards, <br><strong>The HairCare Team</strong></p>
+      </div>
+    </div>
+  </div>
+  `;
+};
+
 
 
 
 module.exports = {
   sendForgotPasswordEmail,
   sendEmailInfoBooking,
-  sendEmailCancelBooking
+  sendEmailCancelBooking,
+  sendEmailCompleteService
 };

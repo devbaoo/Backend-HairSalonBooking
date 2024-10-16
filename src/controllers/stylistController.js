@@ -81,6 +81,20 @@ let getListCustomerForStylist = async (req, res) => {
   }
 };
 
+let completeService = async (req, res) => {
+  try {
+    let response = await stylistService.completeService(req.body);
+    res.status(200).json(response);
+  } catch (error) {
+    console.error(error);
+    res.status(200).json({
+      errCode: 1,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+
 module.exports = {
   getAllStylists: getAllStylists,
   postInfoStylist: postInfoStylist,
@@ -88,4 +102,5 @@ module.exports = {
   createSchedule: createSchedule,
   getScheduleByDate: getScheduleByDate,
   getListCustomerForStylist: getListCustomerForStylist,
+  completeService: completeService
 };

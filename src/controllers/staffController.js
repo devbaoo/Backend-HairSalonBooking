@@ -30,5 +30,5 @@ let cancelBookingForStaff = async (req, res) => {
 
 module.exports = {
     getAllBooking: getAllBooking,
-    cancelBookingForStaff: cancelBookingForStaff
+    cancelBookingForStaff: cancelBookingForStaff,
 }
