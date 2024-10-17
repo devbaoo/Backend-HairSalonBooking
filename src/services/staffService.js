@@ -17,6 +17,7 @@ let getAllBooking = (date) => {
                 let data = await db.Booking.findAll({
                     where: {
                         statusId: "S2",
+                        statusId: "S1",
                         date: date,
                     },
                     include: [
