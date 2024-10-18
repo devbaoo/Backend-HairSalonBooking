@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     };
     BookingService.init({
         bookingId: DataTypes.INTEGER,
-        bookingId: DataTypes.INTEGER,
+        serviceId: DataTypes.INTEGER,
     }, {
         sequelize,
         modelName: 'BookingService',
