@@ -26,9 +26,23 @@ let cancelBookingForStaff = async (req, res) => {
     }
 };
 
+let getBookingConfirmAndPayment = async (req, res) => {
+    try {
+        let response = await staffService.getBookingConfirmAndPayment(req.query.date);
+        res.status(200).json(response);
+    } catch (error) {
+        console.error(error);
+        res.status(200).json({
+            errCode: 1,
+            message: "Internal Server Error",
+        });
+    }
+};
+
 
 
 module.exports = {
     getBookingPending: getBookingPending,
     cancelBookingForStaff: cancelBookingForStaff,
+    getBookingConfirmAndPayment: getBookingConfirmAndPayment
 }
