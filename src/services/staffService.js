@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { sendEmailCancelBooking } from "../../src/services/emailService";
 require("dotenv").config();
 
-let getAllBooking = (date) => {
+let getBookingPending = (date) => {
     return new Promise(async (resolve, reject) => {
         try {
             if (!date) {
@@ -16,7 +16,6 @@ let getAllBooking = (date) => {
             } else {
                 let data = await db.Booking.findAll({
                     where: {
-                        statusId: "S2",
                         statusId: "S1",
                         date: date,
                     },
@@ -115,6 +114,6 @@ let cancelBookingForStaff = (data) => {
 };
 
 module.exports = {
-    getAllBooking: getAllBooking,
+    getBookingPending: getBookingPending,
     cancelBookingForStaff: cancelBookingForStaff,
 };
