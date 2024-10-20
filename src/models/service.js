@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Service.hasMany(models.Feedback, { foreignKey: "serviceId" });
       Service.belongsToMany(models.Booking, {
-        through: 'BookingService', foreignKey: 'serviceId', otherKey: 'bookingId'
+        through: 'BookingService', foreignKey: 'serviceId', otherKey: 'bookingId', as: "bookings",
       });
     }
   }

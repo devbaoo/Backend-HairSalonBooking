@@ -29,6 +29,7 @@ module.exports = (sequelize, DataTypes) => {
         through: "BookingService",
         foreignKey: "bookingId",
         otherKey: "serviceId",
+        as: "services",
       });
     }
   }

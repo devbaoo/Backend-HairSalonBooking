@@ -244,9 +244,29 @@ let getBookingById = (customerId) => {
               ],
             },
             {
+              model: db.User,
+              as: "stylistDataBooking",
+              attributes: ["email", "firstName", "address", "gender"],
+              include: [
+                {
+                  model: db.Allcode,
+                  as: "genderData",
+                  attributes: ["valueEn", "valueVi"],
+                },
+              ],
+            },
+            {
               model: db.Allcode,
               as: "timeTypeDataBooking",
               attributes: ["valueEn", "valueVi"],
+            },
+            {
+              model: db.Service,
+              as: "services",
+              attributes: ["name"],
+              through: {
+                attributes: [], // Exclude attributes from the through table
+              },
             },
           ],
           raw: false,
