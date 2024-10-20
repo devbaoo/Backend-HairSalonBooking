@@ -26,6 +26,19 @@ let getBookingPending = (date) => {
                             attributes: ["email", "firstName", "address"],
                         },
                         {
+                            model: db.User,
+                            as: "stylistDataBooking",
+                            attributes: ["email", "firstName", "address"],
+                        },
+                        {
+                            model: db.Service,
+                            as: "services",
+                            attributes: ["name"],
+                            through: {
+                                attributes: [], // Exclude attributes from the through table
+                            },
+                        },
+                        {
                             model: db.Allcode,
                             as: "timeTypeDataBooking",
                             attributes: ["valueEn", "valueVi"],
@@ -44,6 +57,65 @@ let getBookingPending = (date) => {
         }
     });
 };
+
+let getBookingConfirmAndPayment = (date) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!date) {
+                resolve({
+                    errCode: 1,
+                    errMsg: "Missing required parameter",
+                });
+                return;
+            } else {
+                let data = await db.Booking.findAll({
+                    where: {
+                        statusId: 'S2',
+                        date: date,
+                    },
+                    include: [
+                        {
+                            model: db.User,
+                            as: "customerData",
+                            attributes: ["email", "firstName", "address"],
+                        },
+                        {
+                            model: db.User,
+                            as: "stylistDataBooking",
+                            attributes: ["email", "firstName", "address"],
+                        },
+                        {
+                            model: db.Service,
+                            as: "services",
+                            attributes: ["name"],
+                            through: {
+                                attributes: [], // Exclude attributes from the through table
+                            },
+                        },
+                        {
+                            model: db.Allcode,
+                            as: "timeTypeDataBooking",
+                            attributes: ["valueEn", "valueVi"],
+                        },
+                        {
+                            model: db.Payment,
+                            as: "payment",
+                            attributes: ["id", "paymentAmount", "paymentMethod", "paymentStatus"],
+                        },
+                    ],
+                    raw: false,
+                    nest: true,
+                })
+                resolve({
+                    errCode: 0,
+                    data: data,
+                });
+            }
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
 
 let cancelBookingForStaff = (data) => {
     return new Promise(async (resolve, reject) => {
@@ -116,4 +188,5 @@ let cancelBookingForStaff = (data) => {
 module.exports = {
     getBookingPending: getBookingPending,
     cancelBookingForStaff: cancelBookingForStaff,
+    getBookingConfirmAndPayment: getBookingConfirmAndPayment
 };
