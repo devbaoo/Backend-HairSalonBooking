@@ -2,6 +2,7 @@ import db from "../models/index";
 import emailService from "./emailService";
 import { v4 as uuidv4 } from "uuid";
 import paypalService from "./paypalService";
+import { Op } from "sequelize";
 require("dotenv").config();
 
 let createBookAppointment = (data) => {
@@ -40,6 +41,7 @@ let createBookAppointment = (data) => {
             customerId: user[0].id,
             date: data.date,
             timeType: data.timeType,
+            statusId: { [Op.ne]: "S4" }, // Chỉ từ chối nếu booking chưa bị hủy (statusId khác S4)
           },
         });
         if (existingBooking) {
@@ -135,6 +137,7 @@ let createBookAppointment = (data) => {
     }
   });
 };
+
 let paymentAndVerifyBookAppointment = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
