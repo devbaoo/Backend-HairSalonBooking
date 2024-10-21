@@ -72,6 +72,7 @@ let cancelBookingForStaff = (data) => {
             let booking = await db.Booking.findOne({
                 where: {
                     id: data.bookingId,
+                    statusId: "S1",
                     statusId: "S2",
                 },
                 include: [
