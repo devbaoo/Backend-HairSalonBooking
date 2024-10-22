@@ -35,8 +35,8 @@ let initWebRoutes = (app) => {
   router.get("/api/get-all-user", userController.getAllUsers);
   router.get("/api/get-user-by-id", userController.getUserById);
   router.put("/api/change-user-status", userController.changeUserStatus);
-  router.get("/api/get-user-points", userController.getUserPoints);
-  router.put("/api/update-user-points", userController.updateUserPoints);
+  router.put("/api/get-user-points", userController.getAndUpdateUserPoints);
+  // router.put("/api/update-user-points", userController.updateUserPoints);
 
   //AllCode API
   router.get("/api/get-allcode", allCodeController.getAllCodeService);
@@ -104,7 +104,7 @@ let initWebRoutes = (app) => {
   router.get("/api/get-all-booking", staffController.getAllBooking);
 
   // Salary API
-  router.post("/api/caculate-salary", salariesController.calculateSalary);
+  router.post("/api/calculate-salary", salariesController.calculateSalary);
   router.get("/api/get-all-salaries", salariesController.getAllSalaries);
   router.get(
     "/api/get-salaries-by-stylistId",
@@ -118,13 +118,14 @@ let initWebRoutes = (app) => {
     "/api/get-salaries-by-month-and-year",
     salariesController.getSalariesByMonthAndYear
   );
+
   //Dashboard API
   router.get("/api/total-users", dashboardController.totalUser);
   router.get("/api/total-services", dashboardController.totalServices);
   router.get("/api/revenue", dashboardController.revenue);
   router.get("/api/total-bookings", dashboardController.totalBookings);
   router.get(
-    "/api/total-comfirmed-booking",
+    "/api/total-confirmed-booking",
     dashboardController.confirmedBooking
   );
   router.get(

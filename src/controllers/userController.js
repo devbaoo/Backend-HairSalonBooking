@@ -113,19 +113,19 @@ let changeUserStatus = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
-let getUserPoints = async (req, res) => {
-  try {
-    let id = req.query.id;
-    let result = await userService.getUserPoints(id);
-    res.status(200).json(result);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-let updateUserPoints = async (req, res) => {
+// let getAndUpdateUserPoints = async (req, res) => {
+//   try {
+//     let id = req.query.id;
+//     let result = await userService.getAndUpdateUserPoints(id);
+//     res.status(200).json(result);
+//   } catch (error) {
+//     res.status(400).json({ error: error.message });
+//   }
+// };
+let getAndUpdateUserPoints = async (req, res) => {
   try {
     let data = req.query.id;
-    let result = await userService.updateUserPoints(data);
+    let result = await userService.getAndUpdateUserPoints(data);
     res.status(200).json(result);
   } catch (error) {
     console.log("Error occurred:", error); // Log chi tiết lỗi
@@ -147,6 +147,6 @@ module.exports = {
   resetPassword: resetPassword,
   getUserById: getUserById,
   changeUserStatus: changeUserStatus,
-  getUserPoints: getUserPoints,
-  updateUserPoints: updateUserPoints,
+  getAndUpdateUserPoints: getAndUpdateUserPoints,
+  // updateUserPoints: updateUserPoints,
 };
