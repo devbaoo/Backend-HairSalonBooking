@@ -92,7 +92,7 @@ let getSalariesByStylistId = async (stylistId) => {
     try {
       let salaries = await db.Salaries.findAll({
         where: { stylistId: stylistId },
-        raw: true,
+        raw: false,
       });
       resolve(salaries);
     } catch (e) {
@@ -103,7 +103,7 @@ let getSalariesByStylistId = async (stylistId) => {
 let updatePaidOnSalaries = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!data.id) {
+      if (!data.id || !data.PaidOn) {
         resolve({
           errCode: 1,
           errMessage: "Missing required fields",
