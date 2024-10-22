@@ -28,15 +28,31 @@ let getAllStylists = async () => {
       let stylists = await db.User.findAll({
         where: { roleId: "R3" },
         attributes: {
-          exclude: ["password",],
+          exclude: ["password"],
         },
+        include: [
+          {
+            model: db.Salaries,
+            as: "salaryData",
+            attributes: ["TotalSalary", "BaseSalary", "Bonuses", "Month", "Year", "PaidOn"],
+          },
+        ],
+        raw: true,
+        nest: true,
       });
-      resolve(stylists);
+      resolve({
+        errCode: 0,
+        data: stylists,
+      });
     } catch (error) {
-      reject(error);
+      reject({
+        errCode: 1,
+        errMsg: error.message,
+      });
     }
   });
 };
+
 let saveDetailInfoStylist = (inputData) => {
   return new Promise(async (resolve, reject) => {
     try {

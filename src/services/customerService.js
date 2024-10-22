@@ -230,7 +230,6 @@ let getBookingById = (customerId) => {
       } else {
         let data = await db.Booking.findAll({
           where: {
-            statusId: "S1",
             customerId: customerId,
           },
           include: [
