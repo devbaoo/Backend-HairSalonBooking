@@ -138,7 +138,7 @@ let getSalariesByStylistId = async (stylistId) => {
 let updatePaidOnSalaries = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!data.id || !data.PaidOn) {
+      if (!data.id) {
         resolve({
           errCode: 1,
           errMessage: "Missing required fields",
@@ -146,7 +146,7 @@ let updatePaidOnSalaries = (data) => {
       } else {
         let salary = await db.Salaries.findByPk(data.id, { raw: false });
         if (salary) {
-          salary.PaidOn = data.PaidOn;
+          salary.PaidOn = data.PaidOn || new Date();
           await salary.save();
           resolve({
             errCode: 0,
