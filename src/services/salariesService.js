@@ -55,15 +55,50 @@ const calculateSalary = async (userId, month, year) => {
     // Tính TotalSalary
     const totalSalary = baseSalary + bonuses;
 
-    // Lưu thông tin lương vào bảng salaries
-    await db.Salaries.create({
-      stylistId: userId,
-      BaseSalary: baseSalary,
-      Bonuses: bonuses,
-      TotalSalary: totalSalary,
-      Month: month,
-      Year: year,
+    // Kiểm tra xem đã có bản ghi lương cho stylist này trong tháng và năm này chưa
+    const existingSalary = await db.Salaries.findOne({
+      where: {
+        stylistId: userId,
+        Month: month,
+        Year: year,
+      },
     });
+
+    if (existingSalary) {
+      // Nếu đã có, cập nhật bản ghi hiện tại
+      if (existingSalary.PaidOn !== null) {
+        console.error(
+          "Cannot update salary record as it has already been paid."
+        );
+        return {
+          message: "Cannot update salary record as it has already been paid.",
+        };
+      }
+      await db.Salaries.update(
+        {
+          BaseSalary: baseSalary,
+          Bonuses: bonuses,
+          TotalSalary: totalSalary,
+        },
+        {
+          where: {
+            stylistId: userId,
+            Month: month,
+            Year: year,
+          },
+        }
+      );
+    } else {
+      // Nếu chưa có, tạo bản ghi mới
+      await db.Salaries.create({
+        stylistId: userId,
+        BaseSalary: baseSalary,
+        Bonuses: bonuses,
+        TotalSalary: totalSalary,
+        Month: month,
+        Year: year,
+      });
+    }
 
     return {
       stylistId: userId,
