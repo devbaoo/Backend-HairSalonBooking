@@ -68,13 +68,11 @@ let cancelBookingForStaff = (data) => {
         return;
       }
 
-      // Tìm booking với id và statusId = "S1" hoặc "S2"
       let booking = await db.Booking.findOne({
         where: {
           id: data.bookingId,
-          statusId: {
-            [db.Sequelize.Op.or]: ["S1", "S2"], // Tìm với statusId là S1 hoặc S2
-          },
+          statusId: "S1",
+          statusId: "S2",
         },
         include: [
           {
@@ -91,28 +89,24 @@ let cancelBookingForStaff = (data) => {
         raw: true,
         nest: true,
       });
-
-      // Nếu tìm thấy booking
       if (booking) {
         let dataSend = {
-          receiverEmail: data.email, // Lấy email từ dữ liệu booking tìm được
+          receiverEmail: data.email,
           customerName: data.firstName,
-          stylistName: data.firstName,
-          time: data.timeString, // giữ nguyên giá trị từ data truyền vào
+          stylistName: data.stylistName,
+          time: data.timeString,
           contactLink: "https://yourwebsite.com/contact",
         };
 
-        // Gửi email thông báo hủy
         await emailService.sendEmailCancelBooking(dataSend);
 
-        // Cập nhật trạng thái của booking và thanh toán
         await db.Booking.update(
-          { statusId: "S4" }, // Chuyển statusId thành S4
+          { statusId: "S4" },
           { where: { id: data.bookingId } }
         );
 
         await db.Payment.update(
-          { paymentStatus: "Failed" }, // Cập nhật paymentStatus thành Failed
+          { paymentStatus: "Failed" },
           { where: { bookingId: data.bookingId, paymentStatus: "Completed" } }
         );
 
@@ -127,11 +121,7 @@ let cancelBookingForStaff = (data) => {
         });
       }
     } catch (e) {
-      reject({
-        errCode: 3,
-        errMsg: "An error occurred",
-        error: e,
-      });
+      reject(e);
     }
   });
 };
