@@ -23,7 +23,6 @@ module.exports = (sequelize, DataTypes) => {
         targetKey: "keyMap",
         as: "roleData",
       });
-      User.hasOne(models.Stylist_Info, { foreignKey: "stylistId" });
       User.hasMany(models.Schedule, {
         foreignKey: "stylistId",
         as: "stylistData",
