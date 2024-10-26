@@ -3,12 +3,12 @@ import { Sequelize } from "sequelize";
 import salaries from "../models/salaries";
 const { Op } = Sequelize;
 
-const calculateSalary = async (userId, month, year) => {
+const calculateSalary = async (stylistId, month, year) => {
   try {
     // Lấy thông tin stylist
     const stylist = await db.User.findOne({
       where: {
-        id: userId,
+        id: stylistId,
         roleId: "R3",
       },
       attributes: ["id", "positionId"],
@@ -38,7 +38,7 @@ const calculateSalary = async (userId, month, year) => {
 
     const bookingsCount = await db.Booking.count({
       where: {
-        stylistId: userId,
+        stylistId: stylistId,
         statusId: "S3",
         createdAt: {
           [Op.between]: [startDate, endDate],
@@ -58,7 +58,7 @@ const calculateSalary = async (userId, month, year) => {
     // Kiểm tra xem đã có bản ghi lương cho stylist này trong tháng và năm này chưa
     const existingSalary = await db.Salaries.findOne({
       where: {
-        stylistId: userId,
+        stylistId: stylistId,
         Month: month,
         Year: year,
       },
@@ -82,7 +82,7 @@ const calculateSalary = async (userId, month, year) => {
         },
         {
           where: {
-            stylistId: userId,
+            stylistId: stylistId,
             Month: month,
             Year: year,
           },
@@ -91,7 +91,7 @@ const calculateSalary = async (userId, month, year) => {
     } else {
       // Nếu chưa có, tạo bản ghi mới
       await db.Salaries.create({
-        stylistId: userId,
+        stylistId: stylistId,
         BaseSalary: baseSalary,
         Bonuses: bonuses,
         TotalSalary: totalSalary,
@@ -101,7 +101,7 @@ const calculateSalary = async (userId, month, year) => {
     }
 
     return {
-      stylistId: userId,
+      stylistId: stylistId,
       baseSalary: baseSalary,
       bonuses: bonuses,
       month: month,
