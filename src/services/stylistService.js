@@ -357,7 +357,7 @@ let getListCustomerForStylist = (stylistId, date) => {
 let completeService = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!data.email || !data.stylistId || !data.customerId) {
+      if (!data.email || !data.bookingId) {
         resolve({
           errCode: 1,
           errMsg: 'Missing required parameter'
@@ -366,13 +366,11 @@ let completeService = (data) => {
       } else {
         let appointment = await db.Booking.findOne({
           where: {
-            customerId: data.customerId,
-            stylistId: data.stylistId,
+            id: data.bookingId,
             statusId: 'S2'
           },
           raw: false
         });
-
         if (appointment) {
           appointment.statusId = 'S3';
           await appointment.save();
