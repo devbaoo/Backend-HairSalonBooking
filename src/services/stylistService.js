@@ -34,7 +34,15 @@ let getAllStylists = async () => {
           {
             model: db.Salaries,
             as: "salaryData",
-            attributes: ["TotalSalary", "BaseSalary", "Bonuses", "Month", "Year", "PaidOn"],
+            attributes: [
+              ["id", "SalaryId"],
+              "TotalSalary",
+              "BaseSalary",
+              "Bonuses",
+              "Month",
+              "Year",
+              "PaidOn",
+            ],
           },
         ],
         raw: true,
@@ -188,7 +196,7 @@ let createSchedule = (scheduleData) => {
       if (!scheduleData.arrSchedule || !scheduleData.arrSchedule.length) {
         resolve({
           errCode: 1,
-          errMsg: 'Missing required parameter: arrSchedule'
+          errMsg: "Missing required parameter: arrSchedule",
         });
         return;
       }
@@ -199,22 +207,22 @@ let createSchedule = (scheduleData) => {
 
       // Check for missing stylistId or date
       if (!stylistId) {
-        console.error('stylistId is missing:', scheduleData);
+        console.error("stylistId is missing:", scheduleData);
         resolve({
           errCode: 2,
-          errMsg: 'Missing required parameter: stylistId'
+          errMsg: "Missing required parameter: stylistId",
         });
         return;
       }
       if (!date) {
         resolve({
           errCode: 3,
-          errMsg: 'Missing required parameter: date'
+          errMsg: "Missing required parameter: date",
         });
         return;
       }
 
-      let schedule = scheduleData.arrSchedule.map(time => {
+      let schedule = scheduleData.arrSchedule.map((time) => {
         time.maxNumber = MAX_NUMBER_SCHEDULE;
         return time;
       });
@@ -223,15 +231,15 @@ let createSchedule = (scheduleData) => {
       let existing = await db.Schedule.findAll({
         where: {
           stylistId: stylistId,
-          date: date // Ensure we're fetching the correct date
+          date: date, // Ensure we're fetching the correct date
         },
-        attributes: ['timeType', 'date', 'stylistId', 'maxNumber'],
-        raw: true
+        attributes: ["timeType", "date", "stylistId", "maxNumber"],
+        raw: true,
       });
 
       // Compare only the timeType since stylistId and date are already fixed
       let toCreate = _.differenceWith(schedule, existing, (a, b) => {
-        return a.timeType === b.timeType;  // Only compare timeType
+        return a.timeType === b.timeType; // Only compare timeType
       });
 
       // If there are new schedules, insert them into the database
@@ -240,26 +248,23 @@ let createSchedule = (scheduleData) => {
       } else {
         resolve({
           errCode: 4,
-          errMsg: 'No new schedule to create, duplicate timeType found!'
+          errMsg: "No new schedule to create, duplicate timeType found!",
         });
         return;
       }
 
       resolve({
         errCode: 0,
-        errMsg: 'Schedule created successfully!'
+        errMsg: "Schedule created successfully!",
       });
     } catch (e) {
       reject({
         errCode: -1,
-        errMsg: 'An error occurred while creating the schedule'
+        errMsg: "An error occurred while creating the schedule",
       });
     }
   });
 };
-
-
-
 
 let getScheduleByDate = (stylistId, date) => {
   return new Promise(async (resolve, reject) => {
@@ -353,14 +358,13 @@ let getListCustomerForStylist = (stylistId, date) => {
   });
 };
 
-
 let completeService = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!data.email || !data.bookingId) {
         resolve({
           errCode: 1,
-          errMsg: 'Missing required parameter'
+          errMsg: "Missing required parameter",
         });
         return;
       } else {
@@ -369,10 +373,10 @@ let completeService = (data) => {
             id: data.bookingId,
             statusId: 'S2'
           },
-          raw: false
+          raw: false,
         });
         if (appointment) {
-          appointment.statusId = 'S3';
+          appointment.statusId = "S3";
           await appointment.save();
         }
 
@@ -382,12 +386,12 @@ let completeService = (data) => {
           customerName: data.customerName,
           serviceDate: data.serviceDate,
           serviceTime: data.serviceTime,
-          feedbackLink: data.feedbackLink // Include feedback link if needed
+          feedbackLink: data.feedbackLink, // Include feedback link if needed
         });
 
         resolve({
           errCode: 0,
-          errMsg: 'Ok'
+          errMsg: "Ok",
         });
       }
     } catch (e) {
@@ -396,7 +400,6 @@ let completeService = (data) => {
   });
 };
 
-
 module.exports = {
   getAllStylists: getAllStylists,
   saveDetailInfoStylist: saveDetailInfoStylist,
@@ -404,5 +407,5 @@ module.exports = {
   createSchedule: createSchedule,
   getScheduleByDate: getScheduleByDate,
   getListCustomerForStylist: getListCustomerForStylist,
-  completeService: completeService
+  completeService: completeService,
 };
