@@ -2,8 +2,12 @@ import salariesService from "../services/salariesService";
 
 let calculateSalary = async (req, res) => {
   try {
-    const { userId, month, year } = req.body;
-    let response = await salariesService.calculateSalary(userId, month, year);
+    const { stylistId, month, year } = req.body;
+    let response = await salariesService.calculateSalary(
+      stylistId,
+      month,
+      year
+    );
     return res.status(200).json(response);
   } catch (e) {
     return res.status(500).json({
