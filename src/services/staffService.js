@@ -28,7 +28,7 @@ let getAllBooking = (date) => {
                         {
                             model: db.User,
                             as: "stylistDataBooking",
-                            attributes: ["email", "firstName", "address"],
+                            attributes: ["email", "firstName", "lastName", "address"],
                         },
                         {
                             model: db.Service,
