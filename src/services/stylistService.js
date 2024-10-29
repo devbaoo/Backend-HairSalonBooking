@@ -274,8 +274,6 @@ let completeService = (data) => {
 
 module.exports = {
   getAllStylists: getAllStylists,
-  saveDetailInfoStylist: saveDetailInfoStylist,
-  getDetailStylistById: getDetailStylistById,
   createSchedule: createSchedule,
   getScheduleByDate: getScheduleByDate,
   getListCustomerForStylist: getListCustomerForStylist,

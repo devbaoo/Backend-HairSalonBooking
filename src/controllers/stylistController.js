@@ -74,8 +74,6 @@ let completeService = async (req, res) => {
 
 module.exports = {
   getAllStylists: getAllStylists,
-  postInfoStylist: postInfoStylist,
-  getDetailStylistById: getDetailStylistById,
   createSchedule: createSchedule,
   getScheduleByDate: getScheduleByDate,
   getListCustomerForStylist: getListCustomerForStylist,
