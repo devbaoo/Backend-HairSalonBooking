@@ -23,7 +23,7 @@ let getAllBooking = (date) => {
                         {
                             model: db.User,
                             as: "customerData",
-                            attributes: ["email", "firstName", "address"],
+                            attributes: ["email", "firstName", "lastName", "address"],
                         },
                         {
                             model: db.User,

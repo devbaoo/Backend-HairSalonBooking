@@ -201,7 +201,7 @@ let getListCustomerForStylist = (stylistId, date) => {
             {
               model: db.User,
               as: "customerData",
-              attributes: ["email", "firstName", "address", "gender"],
+              attributes: ["email", "firstName", "lastName", "address", "gender"],
               include: [
                 {
                   model: db.Allcode,
