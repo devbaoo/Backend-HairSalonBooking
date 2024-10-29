@@ -236,7 +236,7 @@ let getBookingById = (customerId) => {
             {
               model: db.User,
               as: "customerData",
-              attributes: ["email", "firstName", "address", "gender"],
+              attributes: ["email", "firstName", "lastName", "address", "gender"],
               include: [
                 {
                   model: db.Allcode,
@@ -248,7 +248,7 @@ let getBookingById = (customerId) => {
             {
               model: db.User,
               as: "stylistDataBooking",
-              attributes: ["email", "firstName", "address", "gender"],
+              attributes: ["email", "firstName", "lastName", "address", "gender"],
               include: [
                 {
                   model: db.Allcode,
