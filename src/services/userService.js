@@ -32,6 +32,7 @@ let handleUserLogin = (email, password) => {
             "password",
             "lastName",
             "firstName",
+            "status",
           ],
           where: { email: email },
           raw: true,
@@ -64,6 +65,7 @@ let handleUserLogin = (email, password) => {
               roleId: user.roleId,
               accessToken,
               refreshToken,
+              status: user.status,
             });
           }
         } else {
