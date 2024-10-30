@@ -193,7 +193,9 @@ let getListCustomerForStylist = (stylistId, date) => {
       } else {
         let data = await db.Booking.findAll({
           where: {
-            statusId: "S2",
+            statusId: {
+              [Op.or]: ["S2", "S3"],
+            },
             stylistId: stylistId,
             date: date,
           },
