@@ -97,7 +97,7 @@ let cancelBookingForStaff = (data) => {
                     customerName: data.firstName,
                     stylistName: data.stylistName,
                     time: data.timeString,
-                    contactLink: "https://yourwebsite.com/contact",
+                    contactLink: "https://hair-salon-vjp.azurewebsites.net/",
                 };
 
                 await emailService.sendEmailCancelBooking(dataSend);
