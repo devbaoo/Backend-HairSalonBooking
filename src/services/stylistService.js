@@ -4,6 +4,8 @@ import { where } from "sequelize";
 import _, { includes } from "lodash";
 import { raw } from "body-parser";
 import emailService from "./emailService";
+import { Op } from "sequelize";
+
 const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
 
 // let getAllStylists = () => {
