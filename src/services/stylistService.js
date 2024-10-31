@@ -219,6 +219,14 @@ let getListCustomerForStylist = (stylistId, date) => {
               as: "timeTypeDataBooking",
               attributes: ["valueEn", "valueVi"],
             },
+            {
+              model: db.Service,
+              as: "services",
+              attributes: ["id", "name"], // Include Service ID and name
+              through: {
+                attributes: [], // Exclude attributes from the through table
+              },
+            },
           ],
           raw: false,
           nest: true,
@@ -233,7 +241,6 @@ let getListCustomerForStylist = (stylistId, date) => {
     }
   });
 };
-
 let completeService = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
