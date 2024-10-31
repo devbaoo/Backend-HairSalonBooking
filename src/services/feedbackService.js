@@ -83,14 +83,26 @@ let getFeedbackByServiceId = async (serviceId) => {
         where: { serviceId },
         include: [{ model: db.User, attributes: ["firstName", "lastName"] }],
         raw: true,
+        nest: true, // Sử dụng nest để tổ chức dữ liệu dễ dàng
       });
+
+      // Định dạng dữ liệu đầu ra theo yêu cầu
+      feedback = feedback.map((item) => ({
+        ...item,
+        firstName: item.User.firstName,
+        lastName: item.User.lastName,
+      }));
+
+      // Loại bỏ thuộc tính `User` không cần thiết
+      feedback.forEach((item) => delete item.User);
 
       if (!feedback || feedback.length === 0) {
         return resolve({
           errCode: 2,
-          errMessage: "No feedback found for the given service ",
+          errMessage: "No feedback found for the given service",
         });
       }
+
       resolve({
         errCode: 0,
         success: true,
