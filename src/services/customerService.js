@@ -265,7 +265,7 @@ let getBookingById = (customerId) => {
             {
               model: db.Service,
               as: "services",
-              attributes: ["name"],
+              attributes: ["id", "name"], // Include Service ID and name
               through: {
                 attributes: [], // Exclude attributes from the through table
               },
