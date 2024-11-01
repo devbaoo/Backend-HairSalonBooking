@@ -107,6 +107,17 @@ let cancelBookingForStaff = (data) => {
                     { where: { id: data.bookingId } }
                 );
 
+                await db.Schedule.update(
+                    { statusTime: "enable" },
+                    {
+                        where: {
+                            stylistId: booking.stylistId,
+                            date: booking.date,
+                            timeType: booking.timeType
+                        }
+                    }
+                );
+
                 await db.Payment.update(
                     { paymentStatus: "Failed" },
                     { where: { bookingId: data.bookingId, paymentStatus: "Completed" } }

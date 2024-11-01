@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     maxNumber: DataTypes.INTEGER,
     date: DataTypes.BIGINT,
     timeType: DataTypes.STRING,
+    statusTime: DataTypes.STRING,
     stylistId: DataTypes.INTEGER,
   }, {
     sequelize,
