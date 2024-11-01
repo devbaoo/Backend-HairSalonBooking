@@ -64,7 +64,7 @@ let getAllStylists = async () => {
 };
 
 
-let createSchedule = (scheduleData) => {
+const createSchedule = (scheduleData) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!scheduleData.arrSchedule || !scheduleData.arrSchedule.length) {
@@ -75,11 +75,9 @@ let createSchedule = (scheduleData) => {
         return;
       }
 
-      // Extract stylistId and date from the first schedule item
       const stylistId = scheduleData.arrSchedule[0].stylistId;
       const date = scheduleData.arrSchedule[0].date;
 
-      // Check for missing stylistId or date
       if (!stylistId) {
         console.error("stylistId is missing:", scheduleData);
         resolve({
@@ -97,26 +95,26 @@ let createSchedule = (scheduleData) => {
       }
 
       let schedule = scheduleData.arrSchedule.map((time) => {
-        time.maxNumber = MAX_NUMBER_SCHEDULE;
-        return time;
+        return {
+          ...time,
+          maxNumber: MAX_NUMBER_SCHEDULE,
+          statusTime: "enable",
+        };
       });
 
-      // Fetch existing schedules for the stylist on the specified date
       let existing = await db.Schedule.findAll({
         where: {
           stylistId: stylistId,
-          date: date, // Ensure we're fetching the correct date
+          date: date,
         },
         attributes: ["timeType", "date", "stylistId", "maxNumber"],
         raw: true,
       });
 
-      // Compare only the timeType since stylistId and date are already fixed
       let toCreate = _.differenceWith(schedule, existing, (a, b) => {
-        return a.timeType === b.timeType; // Only compare timeType
+        return a.timeType === b.timeType;
       });
 
-      // If there are new schedules, insert them into the database
       if (toCreate && toCreate.length > 0) {
         await db.Schedule.bulkCreate(toCreate);
       } else {
@@ -139,6 +137,7 @@ let createSchedule = (scheduleData) => {
     }
   });
 };
+
 
 let getScheduleByDate = (stylistId, date) => {
   return new Promise(async (resolve, reject) => {

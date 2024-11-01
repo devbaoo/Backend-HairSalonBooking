@@ -20,6 +20,9 @@ module.exports = {
       timeType: {
         type: Sequelize.STRING
       },
+      statusTime: {
+        type: Sequelize.STRING,
+      },
       stylistId: {
         type: Sequelize.INTEGER
       },

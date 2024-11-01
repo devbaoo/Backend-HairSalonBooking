@@ -7,6 +7,7 @@ require("dotenv").config();
 
 let createBookAppointment = (data) => {
   return new Promise(async (resolve, reject) => {
+    const transaction = await db.sequelize.transaction();
     try {
       if (
         !data.email ||
@@ -23,8 +24,30 @@ let createBookAppointment = (data) => {
         });
         return;
       }
+
       let token = uuidv4();
-      // Tìm hoặc tạo người dùng dựa vào email
+
+      // Kiểm tra xem slot thời gian có khả dụng hay không trong transaction
+      let availableSlot = await db.Schedule.findOne({
+        where: {
+          stylistId: data.stylistId,
+          date: data.date,
+          timeType: data.timeType,
+          statusTime: "enable",
+        },
+        lock: transaction.LOCK.UPDATE, // Khóa để ngăn truy cập đồng thời
+        transaction, // Sử dụng transaction
+      });
+
+      if (!availableSlot) {
+        await transaction.rollback(); // Hủy giao dịch nếu slot không khả dụng
+        resolve({
+          errCode: 2,
+          errMsg: "The selected time slot is already booked",
+        });
+        return;
+      }
+
       let user = await db.User.findOrCreate({
         where: { email: data.email },
         defaults: {
@@ -32,106 +55,97 @@ let createBookAppointment = (data) => {
           roleId: "R4",
           firstName: data.fullName,
         },
+        transaction, // Bao gồm trong transaction
       });
 
-      if (user && user[0]) {
-        let existingBooking = await db.Booking.findOne({
-          where: {
-            stylistId: data.stylistId,
-            customerId: user[0].id,
-            date: data.date,
-            timeType: data.timeType,
-            statusId: { [Op.ne]: "S4" }, // Chỉ từ chối nếu booking chưa bị hủy (statusId khác S4)
-          },
-        });
-        if (existingBooking) {
-          resolve({
-            errCode: 2,
-            errMsg: "Booking already exists for the selected time and date",
-          });
-          return;
-        }
-        let discount = 0;
-        if (data.usePoints && data.pointsToUse > 0) {
-          const pointsToUse = Math.min(user[0].points, data.pointsToUse);
-          const discountPercentage = Math.floor(pointsToUse / 10) * 0.1; // 10 points = 10%
-          discount = data.amount * discountPercentage;
+      let discount = 0;
+      if (data.usePoints && data.pointsToUse > 0) {
+        const pointsToUse = Math.min(user[0].points, data.pointsToUse);
+        const discountPercentage = Math.floor(pointsToUse / 10) * 0.1;
+        discount = data.amount * discountPercentage;
 
-          // Giảm số điểm của user
-          await db.User.update(
-            { points: user[0].points - pointsToUse },
-            { where: { id: user[0].id } }
-          );
-        }
-        // Tạo booking mới
-        let newBooking = await db.Booking.create({
+        await db.User.update(
+          { points: user[0].points - pointsToUse },
+          { where: { id: user[0].id }, transaction }
+        );
+      }
+
+      // Tạo booking mới trong transaction
+      let newBooking = await db.Booking.create(
+        {
           statusId: "S1",
           stylistId: data.stylistId,
           customerId: user[0].id,
           date: data.date,
           timeType: data.timeType,
           token: token,
-        });
-        // Xử lý danh sách serviceIds
-        if (typeof data.serviceIds === "string") {
-          try {
-            data.serviceIds = JSON.parse(data.serviceIds);
-          } catch (e) {
-            resolve({
-              errCode: 1,
-              errMsg: "Invalid serviceIds format",
-            });
-            return;
-          }
+        },
+        { transaction }
+      );
+
+      // Cập nhật statusTime trong bảng Schedule
+      await db.Schedule.update(
+        { statusTime: "disable" },
+        {
+          where: {
+            stylistId: data.stylistId,
+            date: data.date,
+            timeType: data.timeType,
+          },
+          transaction,
         }
-        // Nếu có danh sách serviceIds, tạo các bản ghi tương ứng trong bảng BookingService
-        if (Array.isArray(data.serviceIds) && data.serviceIds.length > 0) {
-          const bookingServices = data.serviceIds.map((serviceId) => ({
-            bookingId: newBooking.id,
-            serviceId: serviceId,
-          }));
-          await db.BookingService.bulkCreate(bookingServices);
-        }
-        // Tính tổng tiền sau khi trừ discount
-        let totalAmountAfterDiscount = data.amount - discount;
-        if (totalAmountAfterDiscount < 0) {
-          totalAmountAfterDiscount = 0; // Đảm bảo số tiền không bị âm
-        }
-        let paypalResponse = await paypalService.createBooking(
-          totalAmountAfterDiscount.toFixed(2), // Ensure the amount is a string with 2 decimal places
-          `${process.env.URL_REACT}/payment/success?token=${token}&stylistId=${data.stylistId}`,
-          `${process.env.URL_REACT}/payment/cancel?token=${token}`
-        );
-        console.log("PayPal response:", paypalResponse);
-        // Lấy Payment ID và approval URL từ phản hồi của PayPal
-        let paymentId = paypalResponse.id;
-        let approvalLink = paypalResponse.links.find(
-          (link) => link.rel === "approval_url"
-        ).href;
-        // Lưu thông tin Payment vào database
-        let payment = await db.Payment.create({
+      );
+
+      if (Array.isArray(data.serviceIds) && data.serviceIds.length > 0) {
+        const bookingServices = data.serviceIds.map((serviceId) => ({
           bookingId: newBooking.id,
-          paymentAmount: totalAmountAfterDiscount,
-          paymentStatus: "Pending",
-          paymentId: paymentId,
-          paymentMethod: "PayPal",
-          payerEmail: data.email,
-        });
-        await emailService.sendEmailInfoBooking({
-          receiverEmail: data.email,
-          customerName: data.fullName,
-          time: data.timeString,
-          stylistName: data.stylistName,
-          amount: totalAmountAfterDiscount,
-          redirectLink: approvalLink,
-        });
-        resolve({
-          errCode: 0,
-          errMsg: "Customer booking appointment successfully",
-          paymentId: paymentId,
-        });
+          serviceId: serviceId,
+        }));
+        await db.BookingService.bulkCreate(bookingServices, { transaction });
       }
+
+      // Xử lý thanh toán và email sau khi tạo booking thành công
+      await transaction.commit(); // Cam kết giao dịch trước khi xử lý thanh toán và email
+
+      let totalAmountAfterDiscount = data.amount - discount;
+      if (totalAmountAfterDiscount < 0) totalAmountAfterDiscount = 0;
+
+      let paypalResponse = await paypalService.createBooking(
+        totalAmountAfterDiscount.toFixed(2),
+        `${process.env.URL_BACKEND}/payment/success?token=${token}&stylistId=${data.stylistId}`,
+        `${process.env.URL_REACT}/payment/cancel?token=${token}`
+      );
+
+      let paymentId = paypalResponse.id;
+      let approvalLink = paypalResponse.links.find(
+        (link) => link.rel === "approval_url"
+      ).href;
+
+      await db.Payment.create({
+        bookingId: newBooking.id,
+        paymentAmount: totalAmountAfterDiscount,
+        paymentStatus: "Pending",
+        paymentId: paymentId,
+        paymentMethod: "PayPal",
+        payerEmail: data.email,
+      });
+
+      await emailService.sendEmailInfoBooking({
+        receiverEmail: data.email,
+        customerName: data.fullName,
+        time: data.timeString,
+        stylistName: data.stylistName,
+        amount: totalAmountAfterDiscount,
+        redirectLink: approvalLink,
+      });
+
+      resolve({
+        errCode: 0,
+        errMsg: "Customer booking appointment successfully",
+        paymentId: paymentId,
+      });
     } catch (e) {
+      if (transaction) await transaction.rollback(); // Hủy giao dịch nếu có lỗi
       console.log("Error during booking:", e);
       reject(e);
     }
@@ -158,7 +172,7 @@ let paymentAndVerifyBookAppointment = (data) => {
           statusId: "S1",
         },
         include: [{ model: db.Payment, as: "payment" }],
-        raw: true,
+        raw: false,
         nest: true,
       });
 
@@ -172,16 +186,16 @@ let paymentAndVerifyBookAppointment = (data) => {
 
       // Use the Payment ID (stored in paymentId) to capture the payment
       let paymentCapture = await paypalService.capturePayment(
-        appointment.payment.paymentId,
+        paymentId,
         payerId
-      ); // Use Payment ID here
+      );
 
       if (paymentCapture && paymentCapture.state === "approved") {
         await db.Payment.update(
           {
             paymentStatus: "Completed",
-            paymentId: appointment.payment.paymentId, // Ensure Payment ID is used here
-            payerId: payerId, // Save the payerId here
+            paymentId: paymentId,
+            payerId: payerId,
           },
           {
             where: { id: appointment.payment.id },
@@ -217,6 +231,7 @@ let paymentAndVerifyBookAppointment = (data) => {
     }
   });
 };
+
 
 let getBookingById = (customerId) => {
   return new Promise(async (resolve, reject) => {
@@ -295,25 +310,31 @@ let cancelBookingForCustomer = (bookingId) => {
         });
         return;
       }
-
-      // Tìm booking với id và statusId = "S1"
       let booking = await db.Booking.findOne({
         where: {
           id: bookingId,
           statusId: "S1",
         },
       });
-
-      // Kiểm tra nếu booking tồn tại
       if (booking) {
-        // Cập nhật statusId của booking và paymentStatus của bảng Payment
         await db.Booking.update(
-          { statusId: "S4" }, // chuyển từ S1 sang S4
+          { statusId: "S4" },
           { where: { id: bookingId } }
         );
 
+        await db.Schedule.update(
+          { statusTime: "enable" },
+          {
+            where: {
+              stylistId: booking.stylistId,
+              date: booking.date,
+              timeType: booking.timeType
+            }
+          }
+        );
+
         await db.Payment.update(
-          { paymentStatus: "Failed" }, // chuyển paymentStatus từ Pending sang Failed
+          { paymentStatus: "Failed" },
           { where: { bookingId: bookingId, paymentStatus: "Pending" } }
         );
 
