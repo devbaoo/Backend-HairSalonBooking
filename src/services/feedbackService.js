@@ -1,4 +1,4 @@
-const db = require("../models"); // Ensure the models are correctly imported
+import db from "../models/index";
 
 let createFeedback = async (data) => {
   return new Promise(async (resolve, reject) => {
@@ -42,6 +42,18 @@ let createFeedback = async (data) => {
           errCode: 3,
           success: false,
           errMessage: "Booking not found",
+        });
+      }
+
+      // Check if feedback already exists for this booking and service
+      let existingFeedback = await db.Feedback.findOne({
+        where: { bookingId, serviceId },
+      });
+      if (existingFeedback) {
+        return resolve({
+          errCode: 6,
+          success: false,
+          errMessage: "Feedback already exists for this service in the booking",
         });
       }
 
