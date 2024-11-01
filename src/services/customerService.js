@@ -112,7 +112,7 @@ let createBookAppointment = (data) => {
 
       let paypalResponse = await paypalService.createBooking(
         totalAmountAfterDiscount.toFixed(2),
-        `${process.env.URL_BACKEND}/payment/success?token=${token}&stylistId=${data.stylistId}`,
+        `${process.env.URL_REACT}/payment/success?token=${token}&stylistId=${data.stylistId}`,
         `${process.env.URL_REACT}/payment/cancel?token=${token}`
       );
 
