@@ -388,7 +388,8 @@ let completeService = (data) => {
           customerName: data.customerName,
           serviceDate: data.serviceDate,
           serviceTime: data.serviceTime,
-          feedbackLink: data.feedbackLink, // Include feedback link if needed
+          feedbackLink:
+            "https://hair-salon-vjp.azurewebsites.net/order-history", // Include feedback link if needed
         });
 
         resolve({
